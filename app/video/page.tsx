@@ -99,7 +99,7 @@ export default function Video() {
                             required
                         />
                     </div>
-                    <div>
+                    <div className="text-blue-600">
                         <input
                             type="text"
                             placeholder="Who"
@@ -108,7 +108,7 @@ export default function Video() {
                             required
                         />
                     </div>
-                    <div>
+                    <div className="text-blue-600">
                         <input
                             type="text"
                             placeholder="Where"
