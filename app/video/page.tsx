@@ -89,7 +89,7 @@ export default function Video() {
                 </div>
             )}
             <div>
-                <form onSubmit={handleAddAction}>
+                <form onSubmit={handleAddAction} className="text-black">
                     <div>
                         <input
                             type="text"
