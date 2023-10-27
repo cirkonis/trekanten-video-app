@@ -1,5 +1,6 @@
 'use client'
 
+
 import React, { useState } from "react";
 import Player from "react-player";
 
@@ -22,20 +23,26 @@ export default function Video() {
         setVideo(URL.createObjectURL(file));
     };
     const handlePause = () => {
+        // @ts-ignore
         if (playerRef.current && playerRef.current.getCurrentTime) {
+            // @ts-ignore
             const currentTime = playerRef.current.getCurrentTime();
             setActionData((prevState) => ({ ...prevState, timestamp: currentTime }));
         }
     };
 
-
+    // @ts-ignore
     const handleJumpToTimestamp = (timestamp) => {
+        // @ts-ignore
         if (playerRef.current && playerRef.current.seekTo) {
+            // @ts-ignore
             playerRef.current.seekTo(timestamp);
         }
     };
+    // @ts-ignore
     const handleAddAction = (e) => {
         e.preventDefault();
+        // @ts-ignore
         setActions([...actions, actionData]);
         setActionData({
             action: "",
@@ -56,6 +63,7 @@ export default function Video() {
             {video && (
                 <div>
                     <Player
+                        // @ts-ignore
                         ref={playerRef}
                         url={video}
                         playing={playing}
@@ -128,10 +136,16 @@ export default function Video() {
                 <ul>
                     {actions.map((action, index) => (
                         <li key={index}>
-                            <button onClick={() => handleJumpToTimestamp(action.timestamp)}>
-                                Jump to {action.timestamp} seconds
+                            <button onClick={() => handleJumpToTimestamp(
+                                // @ts-ignore
+                                action.timestamp)}>
+                                Jump to {
+                                // @ts-ignore
+                                action.timestamp} seconds
                             </button>
-                            - {action.action} by {action.who} at {action.where}
+                            - {
+                            // @ts-ignore
+                            action.action} by {action.who} at {action.where}
                         </li>
                     ))}
                 </ul>
