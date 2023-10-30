@@ -1,0 +1,11 @@
+export enum EActions {
+    LEFT="LEFT",
+    RIGHT="RIGHT",
+    TOUCH="TOUCH",
+    ATTACK='ATTACK',
+    ATTACK_NO="ATTACK_NO",
+    PARRY="PARRY",
+    RIPOSTE="RIPOSTE",
+    RIPOSTE_NO="RIPOSTE_NO",
+    COUNTER_ATTACK="COUNTER_ATTACK"
+}

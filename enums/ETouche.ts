@@ -1,0 +1,7 @@
+export enum ETouche{
+    LEFT_FENCER = 'LEFT_FENCER',
+    RIGHT_FENCER ='RIGHT_FENCER',
+    DOUBLE_TOUCH ='DOUBLE_TOUCH',
+    NO_TOUCH='NO_TOUCH'
+
+}
