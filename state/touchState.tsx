@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import {Touch} from "@/types/touch";
+import {FencingTouch} from "@/types/fencingTouch";
 import {Fencer} from "@/types/fencer";
 import {ETouche} from "@/enums/ETouche";
 import {EPosition} from "@/enums/EPosition";
@@ -30,7 +30,7 @@ export type TouchStoreActions = {
     resetTouch: () => void;
 };
 
-const initialTouchState: Touch = {
+const initialTouchState: FencingTouch = {
     type: ETouche.NO_TOUCH,
     givenTo: [],
     receivedBy: [],
@@ -42,7 +42,7 @@ const initialTouchState: Touch = {
     position: EPosition.BOX_CENTER,
 };
 
-export const useTouchStore = create<Touch & TouchStoreActions>((set) => ({
+export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => ({
         ...initialTouchState,
 
         // SETTERS

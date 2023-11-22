@@ -3,7 +3,7 @@ import {EPosition} from "@/enums/EPosition";
 import {ETouchSequenceElements} from "@/enums/EActions";
 import {Fencer} from "@/types/fencer";
 
-export type Touch = {
+export type FencingTouch = {
     type: ETouche
     givenTo: Fencer[];
     receivedBy: Fencer[];
