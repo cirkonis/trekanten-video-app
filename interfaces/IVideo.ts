@@ -1,8 +1,9 @@
 import {IFencer} from "@/interfaces/IFencer";
-import {IAction} from "@/interfaces/IAction";
+import {ITouch} from "@/interfaces/ITouch";
 
 export interface IVideo{
     title: string
-    fencers: IFencer[]
-    actions: IAction[]
+    leftFencer: IFencer
+    rightFencer: IFencer
+    toches: ITouch[]
 }
