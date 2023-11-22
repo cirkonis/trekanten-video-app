@@ -1,4 +1,4 @@
-export enum EActions {
+export enum ETouchSequenceElements {
     LEFT="LEFT",
     RIGHT="RIGHT",
     TOUCH="TOUCH",

@@ -3,57 +3,34 @@
 
 import React, {useState} from "react";
 import Player from "react-player";
-import {IAction} from "@/interfaces/IAction";
-import {IFencer} from "@/interfaces/IFencer";
-import {EActions} from "@/enums/EActions";
 import {EPosition} from "@/enums/EPosition";
 import Select from "react-select";
 import {ETouche} from "@/enums/ETouche";
+import { useVideoStore } from "@/state/videoState";
+import {useTouchStore} from "@/state/touchState";
 
 export default function Video() {
+    const videoStore = useVideoStore();
+    const touchStore = useTouchStore();
     const playerRef = React.createRef();
     const [playing, setPlaying] = useState(false);
-    const [video, setVideo] = useState<string | null>(null);
-    const [leftFencer, setLeftFencer] = useState<IFencer>({
-        name: 'left fencer'
-    })
-    const [rightFencer, setRightFencer] = useState<IFencer>({
-        name: 'right fencer'
-    })
-    const [actions, setActions] = useState<IAction[]>([]); // Array to store actions
-    const [actionData, setActionData] = useState<IAction>({
-        fencerLeft: leftFencer,
-        fencerRight: rightFencer,
-        touchAwardedTo: ETouche.NO_TOUCH,
-        actionSequence: [],
-        actionStartTime: 0,
-        actionEndTime: 0,
-        fencingStartTime: 0,
-        fencingEndTime: 0,
-        position: EPosition.BOX_CENTER
-    });
     const [timestamp, setTimestamp] = useState(0);
-    const [showFencingTime, setShowFencingTime] = useState(false); // Add this state
+    const [showFencingTime, setShowFencingTime] = useState(false);
+    const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
 
     const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // @ts-ignore
-        const file = e.target.files[0];
-        setVideo(URL.createObjectURL(file));
+        if (e.target.files !== null && e.target.files.length > 0) {
+            setUploadedVideo(URL.createObjectURL(e.target.files[0]));
+        } else {
+            // TODO: Handle error
+            console.log('Error uploading video');
+        }
     };
     const handlePause = () => {
         if (playerRef.current) {
-            // @ts-ignore
-            const currentTime = playerRef.current.getCurrentTime();
+            const currentTime = (playerRef.current as any).getCurrentTime();
             setTimestamp(currentTime); // Update the timestamp when the video is paused
         }
-    };
-
-    const handleSetActionStartTime = () => {
-        setActionData((prevState) => ({...prevState, actionStartTime: timestamp}));
-    };
-
-    const handleSetActionEndTime = () => {
-        setActionData((prevState) => ({...prevState, actionEndTime: timestamp}));
     };
 
     function formatTime(timeInSeconds: number) {
@@ -71,8 +48,7 @@ export default function Video() {
     }
 
 
-    // @ts-ignore
-    const handleJumpToTimestamp = (timestamp) => {
+    const handleJumpToTimestamp = (timestamp: number) => {
         // @ts-ignore
         if (playerRef.current && playerRef.current.seekTo) {
             // @ts-ignore
@@ -80,20 +56,34 @@ export default function Video() {
         }
     };
     // @ts-ignore
-    const handleAddAction = (e) => {
+    const handleAddTouch = (e) => {
         e.preventDefault();
-        setActions([...actions, actionData]);
-        setActionData({
-            fencerLeft: leftFencer,
-            fencerRight: rightFencer,
-            touchAwardedTo: actionData.touchAwardedTo,
-            actionSequence: actionData.actionSequence,
-            actionStartTime: actionData.actionStartTime,
-            fencingStartTime: actionData.fencingStartTime,
-            fencingEndTime: actionData.fencingEndTime,
-            position: actionData.position
-        });
+        useVideoStore.getState().addTouch(useTouchStore.getState());
     };
+
+    function handleSetActionStartTime() {
+        setActionData({
+            ...actionData,
+            videoStartTimeStamp: timestamp,
+        });
+    }
+
+    function handleSetActionEndTime() {
+        setActionData({
+            ...actionData,
+            videoEndTimestamp: timestamp,
+        });
+    }
+
+    function getActionDescription(action: any): string {
+        const touchType = action.touch.type;
+
+        if (touchType === ETouche.SINGLE_TOUCH) {
+            return `by ${action.touch.givenTo.name} at ${action.position}`;
+        } else {
+            return touchType === ETouche.DOUBLE_TOUCH ? 'Double Touch' : 'No Touch';
+        }
+    }
 
     return (
         <div>
@@ -118,14 +108,14 @@ export default function Video() {
                 </div>
             )}
             <div>
-                <form onSubmit={handleAddAction}>
+                <form onSubmit={handleAddTouch}>
                     {/*LEFT FENCER*/}
                     <div className="text-blue-600">
                         <input
                             type="text"
                             placeholder="Left Fencer"
-                            value={leftFencer.name}
-                            onChange={(e) => setLeftFencer({...leftFencer, name: e.target.value})}
+                            value={useVideoStore.getState().leftFencer.name}
+                            onChange={(e) => useVideoStore.getState().setLeftFencer({...useVideoStore.getState().leftFencer, name: e.target.value})}
                             required
                         />
                     </div>
@@ -134,8 +124,8 @@ export default function Video() {
                         <input
                             type="text"
                             placeholder="Right Fencer"
-                            value={rightFencer.name}
-                            onChange={(e) => setRightFencer({...rightFencer, name: e.target.value})}
+                            value={useVideoStore.getState().rightFencer.name}
+                            onChange={(e) => useVideoStore.getState().setRightFencer({...useVideoStore.getState().rightFencer, name: e.target.value})}
                             required
                         />
                     </div>
@@ -148,33 +138,82 @@ export default function Video() {
                                 value: action,
                                 label: action,
                             }))}
-                            value={actionData.actionSequence.map((action) => ({
+                            value={actionData.sequence.map((action) => ({
                                 value: action,
                                 label: action,
                             }))}
                             onChange={(selectedOptions) => {
                                 setActionData({
                                     ...actionData,
-                                    actionSequence: selectedOptions.map((option) => option.value)
+                                    sequence: selectedOptions.map((option) => option.value)
                                 });
                             }}
                         />
                     </div>
-                    {/*TOUCH AWARDED*/}
+                    {/* TOUCH AWARDED */}
                     <div className="text-blue-600">
                         <Select
-                            placeholder="Touch awarded to..."
-                            options={Object.values(ETouche).map((touch) => ({
-                                value: touch,
-                                label: touch,
-                            }))}
+                            options={[
+                                {
+                                    value: 'NO_FENCER',
+                                    label: 'NO FENCER',
+                                },
+                                {
+                                    value: 'BOTH_FENCER',
+                                    label: 'BOTH FENCER',
+                                },
+                                {
+                                    value: useVideoStore.getState().leftFencer.name,
+                                    label: useVideoStore.getState().leftFencer.name,
+                                },
+                                {
+                                    value: useVideoStore.getState().rightFencer.name,
+                                    label: useVideoStore.getState().rightFencer.name,
+                                },
+                            ]}
                             value={{
-                                value: actionData.touchAwardedTo,
-                                label: actionData.touchAwardedTo,
+                                value: actionData.touch.givenTo ? actionData.touch.givenTo.name : 'NO_FENCER',
+                                label: actionData.touch.givenTo ? actionData.touch.givenTo.name : 'NO_FENCER',
                             }}
                             onChange={(selectedOption) => {
-                                // @ts-ignore
-                                setActionData({...actionData, touchAwardedTo: selectedOption.value as ETouche});
+                                selectedOption = selectedOption || { value: 'NO_FENCER', label: 'NO FENCER' };
+                                let updatedActionData;
+
+                                if (selectedOption.value === 'NO_FENCER') {
+                                    updatedActionData = {
+                                        ...actionData,
+                                        touch: {
+                                            type: ETouche.NO_TOUCH,
+                                        },
+                                    };
+                                } else if (selectedOption.value === 'BOTH_FENCER') {
+                                    updatedActionData = {
+                                        ...actionData,
+                                        touch: {
+                                            type: ETouche.DOUBLE_TOUCH,
+                                        },
+                                    };
+                                } else {
+                                    const selectedFencer = selectedOption.value === useVideoStore.getState().leftFencer.name
+                                        ? useVideoStore.getState().leftFencer
+                                        : useVideoStore.getState().rightFencer;
+
+                                    const otherFencer = selectedOption.value === useVideoStore.getState().leftFencer.name
+                                        ? useVideoStore.getState().rightFencer
+                                        : useVideoStore.getState().leftFencer;
+
+                                    updatedActionData = {
+                                        ...actionData,
+                                        touch: {
+                                            type: ETouche.SINGLE_TOUCH,
+                                            givenTo: selectedFencer,
+                                            receivedBy: otherFencer,
+                                        },
+                                    };
+
+                                }
+
+                                setActionData(updatedActionData);
                             }}
                         />
                     </div>
@@ -210,8 +249,8 @@ export default function Video() {
                                 <input
                                     type="text"
                                     placeholder="Fencing Start Time (mm:ss)"
-                                    value={formatTime(actionData.fencingStartTime)}
-                                    onChange={(e) => setActionData({ ...actionData, fencingStartTime: parseTime(e.target.value) })}
+                                    value={formatTime(videoStore.currentFencingStartTime)}
+                                    onChange={(e) => videoStore.setCurrentTouchFencingStartTime(parseTime(e.target.value))}
                                     required
                                 />
                             </div>
@@ -220,8 +259,8 @@ export default function Video() {
                                 <input
                                     type="text"
                                     placeholder="Fencing End Time (mm:ss)"
-                                    value={formatTime(actionData.fencingEndTime || 0)}
-                                    onChange={(e) => setActionData({ ...actionData, fencingEndTime: parseTime(e.target.value) })}
+                                    value={formatTime(videoStore.currentFencingEndTime || 0)}
+                                    onChange={(e) => videoStore.setCurrentTouchFencingEndTime(parseTime(e.target.value))}
                                     required
                                 />
                             </div>
@@ -234,8 +273,8 @@ export default function Video() {
                             <div>
                                 Current Timestamp: {timestamp.toFixed(2)} seconds
                             </div>
-                            <div>Action Start Time: {actionData.actionStartTime}</div>
-                            <div>Action End Time: {actionData.actionEndTime}</div>
+                            <div>Action Start Time: {videoStore.currentActionStartTime}</div>
+                            <div>Action End Time: {videoStore.currentActionEndTime}</div>
                             <div className="mb-4">
                                 <button className="btn btn-secondary mx-2" type="button" onClick={handleSetActionStartTime}>
                                     Set Action Start Time to Current Timestamp
@@ -246,26 +285,17 @@ export default function Video() {
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <button type="submit" className="btn btn-primary">Add Action</button>
-                    </div>
                 </form>
             </div>
             <div>
                 <p>Actions:</p>
                 <ul>
-                    {actions.map((action, index) => (
+                    {useVideoStore.getState().touches.map((action: any, index: number) => (
                         <li key={index}>
-                            <button onClick={() => handleJumpToTimestamp(
-                                // @ts-ignore
-                                action.actionStartTime)}>
-                                Jump to {
-                                // @ts-ignore
-                                action.actionStartTime} seconds
+                            <button onClick={() => handleJumpToTimestamp(action.actionStartTime)}>
+                                Jump to {action.actionStartTime} seconds
                             </button>
-                            - {
-                            // @ts-ignore
-                            action.actionSequence} by {action.touchAwardedTo} at {action.position}
+                            - {action.actionSequence} by {getActionDescription(action)}
                         </li>
                     ))}
                 </ul>
