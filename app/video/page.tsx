@@ -3,11 +3,12 @@
 
 import React, {useState} from "react";
 import Player from "react-player";
-import {ETouche} from "@/enums/ETouche";
+import {ETouchTypes} from "@/enums/ETouchTypes";
 import { useVideoStore } from "@/state/videoState";
 import {useTouchStore} from "@/state/touchState";
 import {FencingTouch} from "@/types/fencingTouch";
-import {FencerNameInputs} from "@/components/fencerNameInputs";
+import {FencerNameInputs} from "@/components/FencerNameInputs";
+import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
 
 export default function Video() {
     const videoStore = useVideoStore();
@@ -54,20 +55,23 @@ export default function Video() {
             playerRef.current.seekTo(timestamp);
         }
     };
-    // @ts-ignore
-    const handleAddTouch = (e) => {
-        e.preventDefault();
+
+    function handleAddTouch(){
         useVideoStore.getState().addTouch(useTouchStore.getState());
     };
     
     function getTouchDescription(touch: FencingTouch): string {
         const touchType = touch.type;
 
-        if (touchType === ETouche.SINGLE_TOUCH) {
+        if (touchType === ETouchTypes.SINGLE_TOUCH) {
             return `by ${touch.givenTo[0].name} at ${touch.position}`;
         } else {
-            return touchType === ETouche.DOUBLE_TOUCH ? 'Double Touch' : 'No Touch';
+            return touchType === ETouchTypes.DOUBLE_TOUCH ? 'Double Touch' : 'No Touch';
         }
+    }
+
+    function validateForm(){
+        console.log('validate logic')
     }
 
     return (
@@ -93,29 +97,9 @@ export default function Video() {
                 </div>
             )}
             <div>
-                <form onSubmit={handleAddTouch}>
+                <div>
                     <FencerNameInputs />
-                    {/* SEQUENCE*/}
-            {/*        <div className="text-blue-600">*/}
-            {/*            <Select*/}
-            {/*                isMulti*/}
-            {/*                placeholder="Select Actions"*/}
-            {/*                options={Object.values(EActions).map((action) => ({*/}
-            {/*                    value: action,*/}
-            {/*                    label: action,*/}
-            {/*                }))}*/}
-            {/*                value={actionData.sequence.map((action) => ({*/}
-            {/*                    value: action,*/}
-            {/*                    label: action,*/}
-            {/*                }))}*/}
-            {/*                onChange={(selectedOptions) => {*/}
-            {/*                    setActionData({*/}
-            {/*                        ...actionData,*/}
-            {/*                        sequence: selectedOptions.map((option) => option.value)*/}
-            {/*                    });*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*        </div>*/}
+                    <TouchSequenceBuilder />
             {/*        /!* TOUCH AWARDED *!/*/}
             {/*        <div className="text-blue-600">*/}
             {/*            <Select*/}
@@ -149,14 +133,14 @@ export default function Video() {
             {/*                        updatedActionData = {*/}
             {/*                            ...actionData,*/}
             {/*                            touch: {*/}
-            {/*                                type: ETouche.NO_TOUCH,*/}
+            {/*                                type: ETouchTypes.NO_TOUCH,*/}
             {/*                            },*/}
             {/*                        };*/}
             {/*                    } else if (selectedOption.value === 'BOTH_FENCER') {*/}
             {/*                        updatedActionData = {*/}
             {/*                            ...actionData,*/}
             {/*                            touch: {*/}
-            {/*                                type: ETouche.DOUBLE_TOUCH,*/}
+            {/*                                type: ETouchTypes.DOUBLE_TOUCH,*/}
             {/*                            },*/}
             {/*                        };*/}
             {/*                    } else {*/}
@@ -171,7 +155,7 @@ export default function Video() {
             {/*                        updatedActionData = {*/}
             {/*                            ...actionData,*/}
             {/*                            touch: {*/}
-            {/*                                type: ETouche.SINGLE_TOUCH,*/}
+            {/*                                type: ETouchTypes.SINGLE_TOUCH,*/}
             {/*                                givenTo: selectedFencer,*/}
             {/*                                receivedBy: otherFencer,*/}
             {/*                            },*/}
@@ -187,7 +171,7 @@ export default function Video() {
             {/*        <div className="text-blue-600">*/}
             {/*            <Select*/}
             {/*                placeholder="Select Position"*/}
-            {/*                options={Object.values(EPosition).map((position) => ({*/}
+            {/*                options={Object.values(EPositions).map((position) => ({*/}
             {/*                    value: position,*/}
             {/*                    label: position,*/}
             {/*                }))}*/}
@@ -197,7 +181,7 @@ export default function Video() {
             {/*                }}*/}
             {/*                onChange={(selectedOption) => {*/}
             {/*                    // @ts-ignore*/}
-            {/*                    setActionData({...actionData, position: selectedOption.value as EPosition});*/}
+            {/*                    setActionData({...actionData, position: selectedOption.value as EPositions});*/}
             {/*                }}*/}
             {/*            />*/}
             {/*        </div>*/}
@@ -251,7 +235,7 @@ export default function Video() {
             {/*                </div>*/}
             {/*            </div>*/}
             {/*        </div>*/}
-                </form>
+                </div>
             </div>
             <div>
                 <p>Actions:</p>

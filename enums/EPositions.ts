@@ -1,4 +1,4 @@
-export enum EPosition{
+export enum EPositions{
     BOX_LEFT='BOX_LEFT',
     BOX_CENTER='BOX_CENTER',
     BOX_RIGHT='BOX_RIGHT',

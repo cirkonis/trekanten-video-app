@@ -1,16 +1,16 @@
-import {ETouche} from "@/enums/ETouche";
-import {EPosition} from "@/enums/EPosition";
-import {ETouchSequenceElements} from "@/enums/EActions";
+import {ETouchTypes} from "@/enums/ETouchTypes";
+import {EPositions} from "@/enums/EPositions";
+import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
 import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
-    type: ETouche
+    type: ETouchTypes
     givenTo: Fencer[];
     receivedBy: Fencer[];
     sequence: ETouchSequenceElements[];
     videoStartTimeStamp: number;
-    videoEndTimestamp?: number;
+    videoEndTimeStamp?: number;
     fencingStartTime?: number;
     fencingEndTime?: number;
-    position: EPosition;
+    position: EPositions;
 };
