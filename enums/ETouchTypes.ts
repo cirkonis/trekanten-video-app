@@ -1,4 +1,4 @@
-export enum ETouche{
+export enum ETouchTypes{
     SINGLE_TOUCH ='SINGLE_TOUCH',
     DOUBLE_TOUCH ='DOUBLE_TOUCH',
     NO_TOUCH='NO_TOUCH'

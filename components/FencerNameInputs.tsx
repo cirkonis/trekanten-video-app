@@ -3,8 +3,8 @@ import React from "react";
 
 export function FencerNameInputs() {
     return (
-        <div>
-            <div className="text-blue-600">
+        <div className="flex my-4">
+            <div className="input input-bordered input-accent mr-8">
                 <input
                     type="text"
                     placeholder="Left Fencer"
@@ -16,8 +16,7 @@ export function FencerNameInputs() {
                     required
                 />
             </div>
-            {/*RIGHT FENCER*/}
-            <div className="text-blue-600">
+            <div className="input input-bordered input-accent">
                 <input
                     type="text"
                     placeholder="Right Fencer"
