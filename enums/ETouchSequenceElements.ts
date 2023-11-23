@@ -6,5 +6,6 @@ export enum ETouchSequenceElements {
     COUNTER="Counter",
     BEAT="Beat",
     LINE="Line",
-    NO="No"
+    NO="No",
+    SIMULTANEOUS="Simultaneous",
 }

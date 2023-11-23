@@ -5,8 +5,8 @@ import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
     type: ETouchTypes;
-    givenTo: Fencer[];
-    receivedBy: Fencer[];
+    pointAwardedTo: Fencer[];
+    touchAgainst: Fencer[];
     sequence: ETouchSequenceElements[];
     videoStartTimeStamp: number;
     videoEndTimeStamp?: number;

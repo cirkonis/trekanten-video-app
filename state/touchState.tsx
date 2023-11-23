@@ -8,8 +8,8 @@ import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
 export type TouchStoreActions = {
     // SETTERS
     setTouchType: (type: ETouchTypes) => void;
-    setGivenTo: (givenTo: Fencer[]) => void;
-    setReceivedBy: (receivedBy: Fencer[]) => void;
+    setPointAwardedTo: (givenTo: Fencer[]) => void;
+    setTouchAgainst: (receivedBy: Fencer[]) => void;
     setSequence: (sequence: ETouchSequenceElements[]) => void;
     setVideoStartTimeStamp: (timeStamp: number) => void;
     setVideoEndTimeStamp: (timeStamp: number) => void;
@@ -18,8 +18,8 @@ export type TouchStoreActions = {
     setPosition: (position: EPositions) => void;
     // GETTERS
     getTouchType: () => void;
-    getGivenTo: () => void;
-    getReceivedBy: () => void;
+    getPointAwardedTo: () => void;
+    getTouchAgainst: () => void;
     getSequence: () => void;
     getVideoStartTimeStamp: () => void;
     getVideoEndTimeStamp: () => void;
@@ -31,9 +31,9 @@ export type TouchStoreActions = {
 };
 
 const initialTouchState: FencingTouch = {
-    type: ETouchTypes.SINGLE_TOUCH,
-    givenTo: [],
-    receivedBy: [],
+    type: ETouchTypes.NO_TOUCH,
+    pointAwardedTo: [],
+    touchAgainst: [],
     sequence: [],
     videoStartTimeStamp: 0,
     videoEndTimeStamp: 0,
@@ -47,8 +47,8 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
 
         // SETTERS
         setTouchType: (type: ETouchTypes) => set((state) => ({ type: type })),
-        setGivenTo: (givenTo: Fencer[]) => set((state) => ({ givenTo: givenTo })),
-        setReceivedBy: (receivedBy: Fencer[]) => set((state) => ({ receivedBy: receivedBy })),
+        setPointAwardedTo: (givenTo: Fencer[]) => set((state) => ({ pointAwardedTo: givenTo })),
+        setTouchAgainst: (receivedBy: Fencer[]) => set((state) => ({ touchAgainst: receivedBy })),
         setSequence: (sequence: ETouchSequenceElements[]) => set((state) => ({ sequence: sequence })),
         setVideoStartTimeStamp: (timeStamp: number) => set((state) => ({ videoStartTimeStamp: timeStamp })),
         setVideoEndTimeStamp: (timeStamp: number) => set((state) => ({ videoEndTimeStamp: timeStamp })),
@@ -58,8 +58,8 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
 
         // GETTERS
         getTouchType: () => set((state) => ({ type: state.type })),
-        getGivenTo: () => set((state) => ({ givenTo: state.givenTo })),
-        getReceivedBy: () => set((state) => ({ receivedBy: state.receivedBy })),
+        getPointAwardedTo: () => set((state) => ({ pointAwardedTo: state.pointAwardedTo })),
+        getTouchAgainst: () => set((state) => ({ touchAgainst: state.touchAgainst })),
         getSequence: () => set((state) => ({ sequence: state.sequence })),
         getVideoStartTimeStamp: () => set((state) => ({ videoStartTimeStamp: state.videoStartTimeStamp })),
         getVideoEndTimeStamp: () => set((state) => ({ videoEndTimeStamp: state.videoEndTimeStamp })),

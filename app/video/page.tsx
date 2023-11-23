@@ -65,7 +65,7 @@ export default function Video() {
         const touchType = touch.type;
 
         if (touchType === ETouchTypes.SINGLE_TOUCH) {
-            return `by ${touch.givenTo[0].name} at ${touch.position}`;
+            return `by ${touch.pointAwardedTo[0].name} at ${touch.position}`;
         } else {
             return touchType === ETouchTypes.DOUBLE_TOUCH ? 'Double Touch' : 'No Touch';
         }

@@ -4,8 +4,9 @@ import React from "react";
 export function FencerNameInputs() {
     return (
         <div className="flex my-4 p-4">
-            <div className="input input-bordered input-accent mr-8">
+            <div className="mr-8">
                 <input
+                    className="input input-bordered input-secondary"
                     type="text"
                     placeholder="Left Fencer"
                     value={useVideoStore.getState().leftFencer.name}
@@ -16,8 +17,9 @@ export function FencerNameInputs() {
                     required
                 />
             </div>
-            <div className="input input-bordered input-accent">
+            <div className="">
                 <input
+                    className="input input-bordered input-secondary"
                     type="text"
                     placeholder="Right Fencer"
                     value={useVideoStore.getState().rightFencer.name}
