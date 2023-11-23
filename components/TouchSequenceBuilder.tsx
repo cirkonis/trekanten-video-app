@@ -24,7 +24,7 @@ export function TouchSequenceBuilder() {
     };
 
     return (
-        <div className="my-4">
+        <div className="my-4 p-4">
             <div className="flex flex-row mb-2 h-9 items-center">
                 Touch sequence:
                 {selectedElements.map((element: ETouchSequenceElements, index: number) => (

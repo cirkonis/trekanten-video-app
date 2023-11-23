@@ -31,7 +31,7 @@ export type TouchStoreActions = {
 };
 
 const initialTouchState: FencingTouch = {
-    type: ETouchTypes.NO_TOUCH,
+    type: ETouchTypes.SINGLE_TOUCH,
     givenTo: [],
     receivedBy: [],
     sequence: [],

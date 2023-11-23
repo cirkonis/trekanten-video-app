@@ -4,7 +4,7 @@ import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
 import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
-    type: ETouchTypes
+    type: ETouchTypes;
     givenTo: Fencer[];
     receivedBy: Fencer[];
     sequence: ETouchSequenceElements[];

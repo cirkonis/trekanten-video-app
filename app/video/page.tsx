@@ -9,6 +9,7 @@ import {useTouchStore} from "@/state/touchState";
 import {FencingTouch} from "@/types/fencingTouch";
 import {FencerNameInputs} from "@/components/FencerNameInputs";
 import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
+import {TouchAwarded} from "@/components/TouchAwarded";
 
 export default function Video() {
     const videoStore = useVideoStore();
@@ -100,73 +101,7 @@ export default function Video() {
                 <div>
                     <FencerNameInputs />
                     <TouchSequenceBuilder />
-            {/*        /!* TOUCH AWARDED *!/*/}
-            {/*        <div className="text-blue-600">*/}
-            {/*            <Select*/}
-            {/*                options={[*/}
-            {/*                    {*/}
-            {/*                        value: 'NO_FENCER',*/}
-            {/*                        label: 'NO FENCER',*/}
-            {/*                    },*/}
-            {/*                    {*/}
-            {/*                        value: 'BOTH_FENCER',*/}
-            {/*                        label: 'BOTH FENCER',*/}
-            {/*                    },*/}
-            {/*                    {*/}
-            {/*                        value: useVideoStore.getState().leftFencer.name,*/}
-            {/*                        label: useVideoStore.getState().leftFencer.name,*/}
-            {/*                    },*/}
-            {/*                    {*/}
-            {/*                        value: useVideoStore.getState().rightFencer.name,*/}
-            {/*                        label: useVideoStore.getState().rightFencer.name,*/}
-            {/*                    },*/}
-            {/*                ]}*/}
-            {/*                value={{*/}
-            {/*                    value: actionData.touch.givenTo ? actionData.touch.givenTo.name : 'NO_FENCER',*/}
-            {/*                    label: actionData.touch.givenTo ? actionData.touch.givenTo.name : 'NO_FENCER',*/}
-            {/*                }}*/}
-            {/*                onChange={(selectedOption) => {*/}
-            {/*                    selectedOption = selectedOption || { value: 'NO_FENCER', label: 'NO FENCER' };*/}
-            {/*                    let updatedActionData;*/}
-
-            {/*                    if (selectedOption.value === 'NO_FENCER') {*/}
-            {/*                        updatedActionData = {*/}
-            {/*                            ...actionData,*/}
-            {/*                            touch: {*/}
-            {/*                                type: ETouchTypes.NO_TOUCH,*/}
-            {/*                            },*/}
-            {/*                        };*/}
-            {/*                    } else if (selectedOption.value === 'BOTH_FENCER') {*/}
-            {/*                        updatedActionData = {*/}
-            {/*                            ...actionData,*/}
-            {/*                            touch: {*/}
-            {/*                                type: ETouchTypes.DOUBLE_TOUCH,*/}
-            {/*                            },*/}
-            {/*                        };*/}
-            {/*                    } else {*/}
-            {/*                        const selectedFencer = selectedOption.value === useVideoStore.getState().leftFencer.name*/}
-            {/*                            ? useVideoStore.getState().leftFencer*/}
-            {/*                            : useVideoStore.getState().rightFencer;*/}
-
-            {/*                        const otherFencer = selectedOption.value === useVideoStore.getState().leftFencer.name*/}
-            {/*                            ? useVideoStore.getState().rightFencer*/}
-            {/*                            : useVideoStore.getState().leftFencer;*/}
-
-            {/*                        updatedActionData = {*/}
-            {/*                            ...actionData,*/}
-            {/*                            touch: {*/}
-            {/*                                type: ETouchTypes.SINGLE_TOUCH,*/}
-            {/*                                givenTo: selectedFencer,*/}
-            {/*                                receivedBy: otherFencer,*/}
-            {/*                            },*/}
-            {/*                        };*/}
-
-            {/*                    }*/}
-
-            {/*                    setActionData(updatedActionData);*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*        </div>*/}
+                    <TouchAwarded />
             {/*        /!*POSITION*!/*/}
             {/*        <div className="text-blue-600">*/}
             {/*            <Select*/}
