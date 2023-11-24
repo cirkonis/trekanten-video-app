@@ -10,6 +10,7 @@ import {FencingTouch} from "@/types/fencingTouch";
 import {FencerNameInputs} from "@/components/FencerNameInputs";
 import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
 import {TouchAwarded} from "@/components/TouchAwarded";
+import {PistePosition} from "@/components/PistePosition";
 
 export default function Video() {
     const videoStore = useVideoStore();
@@ -64,7 +65,7 @@ export default function Video() {
     function getTouchDescription(touch: FencingTouch): string {
         const touchType = touch.type;
 
-        if (touchType === ETouchTypes.SINGLE_TOUCH) {
+        if (touchType === ETouchTypes.SINGLE_TOUCH_LEFT || touchType === ETouchTypes.SINGLE_TOUCH_RIGHT) {
             return `by ${touch.pointAwardedTo[0].name} at ${touch.position}`;
         } else {
             return touchType === ETouchTypes.DOUBLE_TOUCH ? 'Double Touch' : 'No Touch';
@@ -102,6 +103,7 @@ export default function Video() {
                     <FencerNameInputs />
                     <TouchSequenceBuilder />
                     <TouchAwarded />
+                    <PistePosition />
             {/*        /!*POSITION*!/*/}
             {/*        <div className="text-blue-600">*/}
             {/*            <Select*/}
