@@ -39,7 +39,7 @@ const initialTouchState: FencingTouch = {
     videoEndTimeStamp: 0,
     fencingStartTime: 0,
     fencingEndTime: 0,
-    position: EPistePositions.BOX_CENTER,
+    position: EPistePositions.CENTER_LINE,
 };
 
 export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => ({
