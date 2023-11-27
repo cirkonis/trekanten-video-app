@@ -10,7 +10,13 @@ export type FencingTouch = {
     sequence: ETouchSequenceElements[];
     videoStartTimeStamp: number;
     videoEndTimeStamp?: number;
-    fencingStartTime?: number;
-    fencingEndTime?: number;
+    fencingStartTime?: {
+        minutes: number;
+        seconds: number;
+    };
+    fencingEndTime?: {
+        minutes: number;
+        seconds: number;
+    }
     position: EPistePositions;
 };

@@ -11,6 +11,7 @@ import {FencerNameInputs} from "@/components/FencerNameInputs";
 import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
 import {TouchAwarded} from "@/components/TouchAwarded";
 import {PistePosition} from "@/components/PistePosition";
+import {FencingTime} from "@/components/FencingTime";
 
 export default function Video() {
     const videoStore = useVideoStore();
@@ -104,56 +105,7 @@ export default function Video() {
                     <TouchSequenceBuilder />
                     <TouchAwarded />
                     <PistePosition />
-            {/*        /!*POSITION*!/*/}
-            {/*        <div className="text-blue-600">*/}
-            {/*            <Select*/}
-            {/*                placeholder="Select Position"*/}
-            {/*                options={Object.values(EPositions).map((position) => ({*/}
-            {/*                    value: position,*/}
-            {/*                    label: position,*/}
-            {/*                }))}*/}
-            {/*                value={{*/}
-            {/*                    value: actionData.position,*/}
-            {/*                    label: actionData.position,*/}
-            {/*                }}*/}
-            {/*                onChange={(selectedOption) => {*/}
-            {/*                    // @ts-ignore*/}
-            {/*                    setActionData({...actionData, position: selectedOption.value as EPositions});*/}
-            {/*                }}*/}
-            {/*            />*/}
-            {/*        </div>*/}
-            {/*        /!* TOGGLE BUTTON for FENCING TIME *!/*/}
-            {/*        <div className="text-blue-600">*/}
-            {/*            <button onClick={() => setShowFencingTime(!showFencingTime)}>*/}
-            {/*                {showFencingTime ? "Hide Fencing Time" : "Show Fencing Time"}*/}
-            {/*            </button>*/}
-            {/*        </div>*/}
-            {/*        /!* CONDITIONAL RENDERING for FENCING TIME *!/*/}
-            {/*        {showFencingTime && (*/}
-            {/*            <div>*/}
-            {/*                <div className="text-blue-600">*/}
-            {/*                    <label>Fencing Start Time (mm:ss)</label>*/}
-            {/*                    <input*/}
-            {/*                        type="text"*/}
-            {/*                        placeholder="Fencing Start Time (mm:ss)"*/}
-            {/*                        value={formatTime(videoStore.currentFencingStartTime)}*/}
-            {/*                        onChange={(e) => videoStore.setCurrentTouchFencingStartTime(parseTime(e.target.value))}*/}
-            {/*                        required*/}
-            {/*                    />*/}
-            {/*                </div>*/}
-            {/*                <div className="text-blue-600">*/}
-            {/*                    <label>Fencing End Time (mm:ss)</label>*/}
-            {/*                    <input*/}
-            {/*                        type="text"*/}
-            {/*                        placeholder="Fencing End Time (mm:ss)"*/}
-            {/*                        value={formatTime(videoStore.currentFencingEndTime || 0)}*/}
-            {/*                        onChange={(e) => videoStore.setCurrentTouchFencingEndTime(parseTime(e.target.value))}*/}
-            {/*                        required*/}
-            {/*                    />*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        )}*/}
-
+                    <FencingTime />
             {/*        /!*ACTION TIME STAMP*!/*/}
             {/*        <div>*/}
             {/*            <div className="flex flex-col">*/}

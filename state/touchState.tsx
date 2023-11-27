@@ -4,6 +4,7 @@ import {Fencer} from "@/types/fencer";
 import {ETouchTypes} from "@/enums/ETouchTypes";
 import {EPistePositions} from "@/enums/EPistePositions";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
+import {Time} from "@/types/Time";
 
 export type TouchStoreActions = {
     // SETTERS
@@ -13,8 +14,8 @@ export type TouchStoreActions = {
     setSequence: (sequence: ETouchSequenceElements[]) => void;
     setVideoStartTimeStamp: (timeStamp: number) => void;
     setVideoEndTimeStamp: (timeStamp: number) => void;
-    setFencingStartTime: (timeStamp: number) => void;
-    setFencingEndTime: (timeStamp: number) => void;
+    setFencingStartTime: (startTime: Time) => void;
+    setFencingEndTime: (endTime: Time) => void;
     setPosition: (position: EPistePositions) => void;
     // GETTERS
     getTouchType: () => void;
@@ -37,8 +38,8 @@ const initialTouchState: FencingTouch = {
     sequence: [],
     videoStartTimeStamp: 0,
     videoEndTimeStamp: 0,
-    fencingStartTime: 0,
-    fencingEndTime: 0,
+    fencingStartTime: {minutes: 0, seconds: 0},
+    fencingEndTime: {minutes: 0, seconds: 0},
     position: EPistePositions.CENTER_LINE,
 };
 
@@ -52,8 +53,8 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
         setSequence: (sequence: ETouchSequenceElements[]) => set((state) => ({ sequence: sequence })),
         setVideoStartTimeStamp: (timeStamp: number) => set((state) => ({ videoStartTimeStamp: timeStamp })),
         setVideoEndTimeStamp: (timeStamp: number) => set((state) => ({ videoEndTimeStamp: timeStamp })),
-        setFencingStartTime: (timeStamp: number) => set((state) => ({ fencingStartTime: timeStamp })),
-        setFencingEndTime: (timeStamp: number) => set((state) => ({ fencingEndTime: timeStamp })),
+        setFencingStartTime: (startTime: Time) => set((state) => ({ fencingStartTime: startTime})),
+        setFencingEndTime: (endTime: Time) => set((state) => ({ fencingEndTime: endTime })),
         setPosition: (position: EPistePositions) => set((state) => ({ position: position })),
 
         // GETTERS
