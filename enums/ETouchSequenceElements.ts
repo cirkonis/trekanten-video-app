@@ -8,4 +8,5 @@ export enum ETouchSequenceElements {
     LINE="Line",
     NO="No",
     SIMULTANEOUS="Simultaneous",
+    REMISE="Remise",
 }

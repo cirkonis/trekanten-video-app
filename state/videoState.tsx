@@ -11,8 +11,6 @@ export type VideoStoreActions = {
     getRightFencer: () => void;
     setLeftFencer: (fencer: Fencer) => void;
     setRightFencer: (fencer: Fencer) => void;
-    setPausedTimeStamp: (timestamp: number) => void;
-    getPausedTimeStamp: () => void;
     setTitle: (title: string) => void;
     resetVideo: () => void;
 };
@@ -26,8 +24,6 @@ const initialVideoState: Video = {
         name: "Right Fencer",
     },
     touches: [],
-
-    pausedTimeStamp: 0,
 };
 
 export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
@@ -41,11 +37,9 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
 
     getLeftFencer: () => set((state) => ({ leftFencer: state.leftFencer })),
     getRightFencer: () => set((state) => ({ rightFencer: state.rightFencer })),
-    getPausedTimeStamp: () => set((state) => ({ pausedTimeStamp: state.pausedTimeStamp })),
 
     setLeftFencer: (fencer: Fencer) => set(() => ({ leftFencer: fencer })),
     setRightFencer: (fencer: Fencer) => set(() => ({ rightFencer: fencer })),
-    setPausedTimeStamp: (timestamp: number) => set(() => ({ pausedTimeStamp: timestamp })),
 
     resetVideo: () => set(() => ({ ...initialVideoState })),
 }));
