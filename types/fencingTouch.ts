@@ -5,6 +5,7 @@ import {Time} from "@/types/time";
 import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
+    id?: number;
     type: ETouchTypes;
     pointAwardedTo: Fencer[];
     touchAgainst: Fencer[];

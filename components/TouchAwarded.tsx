@@ -14,19 +14,26 @@ export function TouchAwarded() {
 
         switch (type) {
             case ETouchTypes.SINGLE_TOUCH_LEFT:
-                useTouchStore.getState().setPointAwardedTo([useVideoStore.getState().leftFencer]);
+                useTouchStore.getState().setPointAwardedTo([leftFencer]);
+                useTouchStore.getState().setTouchAgainst([rightFencer]);
                 break;
             case ETouchTypes.SINGLE_TOUCH_RIGHT:
-                useTouchStore.getState().setPointAwardedTo([useVideoStore.getState().rightFencer]);
+                useTouchStore.getState().setPointAwardedTo([rightFencer]);
+                useTouchStore.getState().setTouchAgainst([leftFencer]);
                 break;
             case ETouchTypes.DOUBLE_TOUCH:
                 useTouchStore.getState().setPointAwardedTo([
                     useVideoStore.getState().leftFencer,
                     useVideoStore.getState().rightFencer,
                 ]);
+                useTouchStore.getState().setTouchAgainst([
+                    useVideoStore.getState().leftFencer,
+                    useVideoStore.getState().rightFencer,
+                ]);
                 break;
             case ETouchTypes.NO_TOUCH:
                 useTouchStore.getState().setPointAwardedTo([]);
+                useTouchStore.getState().setTouchAgainst([]);
                 break;
             default:
                 break;
