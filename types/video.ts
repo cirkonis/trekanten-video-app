@@ -6,5 +6,4 @@ export type Video = {
     leftFencer: Fencer;
     rightFencer: Fencer;
     touches: FencingTouch[];
-    pausedTimeStamp: number;
 };

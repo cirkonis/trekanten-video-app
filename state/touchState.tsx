@@ -4,7 +4,7 @@ import {Fencer} from "@/types/fencer";
 import {ETouchTypes} from "@/enums/ETouchTypes";
 import {EPistePositions} from "@/enums/EPistePositions";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
-import {Time} from "@/types/Time";
+import {Time} from "@/types/time";
 
 export type TouchStoreActions = {
     // SETTERS
@@ -12,8 +12,8 @@ export type TouchStoreActions = {
     setPointAwardedTo: (givenTo: Fencer[]) => void;
     setTouchAgainst: (receivedBy: Fencer[]) => void;
     setSequence: (sequence: ETouchSequenceElements[]) => void;
-    setVideoStartTimeStamp: (timeStamp: number) => void;
-    setVideoEndTimeStamp: (timeStamp: number) => void;
+    setVideoStartTimeStamp: (startTime: Time) => void;
+    setVideoEndTimeStamp: (endTime: Time) => void;
     setFencingStartTime: (startTime: Time) => void;
     setFencingEndTime: (endTime: Time) => void;
     setPosition: (position: EPistePositions) => void;
@@ -36,8 +36,8 @@ const initialTouchState: FencingTouch = {
     pointAwardedTo: [],
     touchAgainst: [],
     sequence: [],
-    videoStartTimeStamp: 0,
-    videoEndTimeStamp: 0,
+    videoStartTimeStamp: {minutes: 0, seconds: 0},
+    videoEndTimeStamp: {minutes: 0, seconds: 0},
     fencingStartTime: {minutes: 0, seconds: 0},
     fencingEndTime: {minutes: 0, seconds: 0},
     position: EPistePositions.CENTER_LINE,
@@ -51,8 +51,8 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
         setPointAwardedTo: (givenTo: Fencer[]) => set((state) => ({ pointAwardedTo: givenTo })),
         setTouchAgainst: (receivedBy: Fencer[]) => set((state) => ({ touchAgainst: receivedBy })),
         setSequence: (sequence: ETouchSequenceElements[]) => set((state) => ({ sequence: sequence })),
-        setVideoStartTimeStamp: (timeStamp: number) => set((state) => ({ videoStartTimeStamp: timeStamp })),
-        setVideoEndTimeStamp: (timeStamp: number) => set((state) => ({ videoEndTimeStamp: timeStamp })),
+        setVideoStartTimeStamp: (startTime: Time ) => set((state) => ({ videoStartTimeStamp: startTime })),
+        setVideoEndTimeStamp: (endTime: Time) => set((state) => ({ videoEndTimeStamp: endTime })),
         setFencingStartTime: (startTime: Time) => set((state) => ({ fencingStartTime: startTime})),
         setFencingEndTime: (endTime: Time) => set((state) => ({ fencingEndTime: endTime })),
         setPosition: (position: EPistePositions) => set((state) => ({ position: position })),

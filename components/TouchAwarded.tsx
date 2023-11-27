@@ -1,9 +1,14 @@
-import React from 'react';
-import {ETouchTypes} from '@/enums/ETouchTypes';
-import {useTouchStore} from "@/state/touchState";
-import {useVideoStore} from "@/state/videoState";
+import React, { useEffect, useState } from 'react';
+import { ETouchTypes } from '@/enums/ETouchTypes';
+import { useTouchStore } from '@/state/touchState';
+import { useVideoStore } from '@/state/videoState';
 
 export function TouchAwarded() {
+    const touchType = useTouchStore(state => state.type);
+    const leftFencer = useVideoStore(state => state.leftFencer);
+    const rightFencer = useVideoStore(state => state.rightFencer);
+// ... (other state variables)
+
     const handleTouchTypeChange = (type: ETouchTypes) => {
         useTouchStore.getState().setTouchType(type);
 
@@ -26,11 +31,7 @@ export function TouchAwarded() {
             default:
                 break;
         }
-    }
-
-    const touchType = useTouchStore.getState().type;
-    const leftFencer = useVideoStore.getState().leftFencer;
-    const rightFencer = useVideoStore.getState().rightFencer;
+    };
 
     return (
         <div className="my-4 p-4">
@@ -40,6 +41,7 @@ export function TouchAwarded() {
                     <input
                         className="mr-2 radio radio-primary"
                         type="radio"
+                        name="touchType"
                         value={ETouchTypes.SINGLE_TOUCH_LEFT}
                         checked={touchType === ETouchTypes.SINGLE_TOUCH_LEFT}
                         onChange={() => handleTouchTypeChange(ETouchTypes.SINGLE_TOUCH_LEFT)}
@@ -51,6 +53,7 @@ export function TouchAwarded() {
                     <input
                         className="mr-2 radio radio-primary"
                         type="radio"
+                        name="touchType"
                         value={ETouchTypes.SINGLE_TOUCH_RIGHT}
                         checked={touchType === ETouchTypes.SINGLE_TOUCH_RIGHT}
                         onChange={() => handleTouchTypeChange(ETouchTypes.SINGLE_TOUCH_RIGHT)}
@@ -62,6 +65,7 @@ export function TouchAwarded() {
                     <input
                         className="mr-2 radio radio-primary"
                         type="radio"
+                        name="touchType"
                         value={ETouchTypes.DOUBLE_TOUCH}
                         checked={touchType === ETouchTypes.DOUBLE_TOUCH}
                         onChange={() => handleTouchTypeChange(ETouchTypes.DOUBLE_TOUCH)}
@@ -73,6 +77,7 @@ export function TouchAwarded() {
                     <input
                         className="mr-2 radio radio-primary"
                         type="radio"
+                        name="touchType"
                         value={ETouchTypes.NO_TOUCH}
                         checked={touchType === ETouchTypes.NO_TOUCH}
                         onChange={() => handleTouchTypeChange(ETouchTypes.NO_TOUCH)}
@@ -80,7 +85,6 @@ export function TouchAwarded() {
                     No Touch
                 </label>
             </div>
-            {/* ... Other components */}
         </div>
     );
 }

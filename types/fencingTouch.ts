@@ -1,6 +1,7 @@
 import {ETouchTypes} from "@/enums/ETouchTypes";
 import {EPistePositions} from "@/enums/EPistePositions";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
+import {Time} from "@/types/time";
 import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
@@ -8,15 +9,9 @@ export type FencingTouch = {
     pointAwardedTo: Fencer[];
     touchAgainst: Fencer[];
     sequence: ETouchSequenceElements[];
-    videoStartTimeStamp: number;
-    videoEndTimeStamp?: number;
-    fencingStartTime?: {
-        minutes: number;
-        seconds: number;
-    };
-    fencingEndTime?: {
-        minutes: number;
-        seconds: number;
-    }
+    videoStartTimeStamp: Time;
+    videoEndTimeStamp?: Time;
+    fencingStartTime?: Time;
+    fencingEndTime?: Time;
     position: EPistePositions;
 };
