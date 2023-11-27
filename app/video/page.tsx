@@ -10,6 +10,8 @@ import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
 import {TouchAwarded} from "@/components/TouchAwarded";
 import {PistePosition} from "@/components/PistePosition";
 import {TheVideoTimeComponent} from "@/components/TheVideoTimeComponent";
+import {Touches} from "@/components/Touches";
+import {AddTouch} from "@/components/AddTouch";
 
 export default function Video() {
 
@@ -42,6 +44,8 @@ export default function Video() {
             <TouchSequenceBuilder/>
             <TouchAwarded/>
             <PistePosition/>
+            <AddTouch/>
+            <Touches/>
         </div>
     );
 }

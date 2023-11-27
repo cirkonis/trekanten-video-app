@@ -1,7 +1,7 @@
 export enum ETouchTypes{
-    SINGLE_TOUCH_LEFT ='SINGLE_TOUCH_LEFT',
-    SINGLE_TOUCH_RIGHT ='SINGLE_TOUCH_RIGHT',
-    DOUBLE_TOUCH ='DOUBLE_TOUCH',
-    NO_TOUCH='NO_TOUCH'
+    SINGLE_TOUCH_LEFT ='Touch Left',
+    SINGLE_TOUCH_RIGHT ='Touch Right',
+    DOUBLE_TOUCH ='Double Touch',
+    NO_TOUCH='No Touch',
 
 }

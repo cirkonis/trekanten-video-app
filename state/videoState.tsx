@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import {Video} from "@/types/video";
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
+import {Time} from "@/types/time";
+import {formatTime} from "@/utils/FormatTime";
 
 export type VideoStoreActions = {
     addTouch: (touch: FencingTouch) => void;
@@ -12,6 +14,7 @@ export type VideoStoreActions = {
     setLeftFencer: (fencer: Fencer) => void;
     setRightFencer: (fencer: Fencer) => void;
     setTitle: (title: string) => void;
+    getTouches: () => void;
     resetVideo: () => void;
 };
 
@@ -37,6 +40,7 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
 
     getLeftFencer: () => set((state) => ({ leftFencer: state.leftFencer })),
     getRightFencer: () => set((state) => ({ rightFencer: state.rightFencer })),
+    getTouches: () => set((state) => ({ touches: state.touches })),
 
     setLeftFencer: (fencer: Fencer) => set(() => ({ leftFencer: fencer })),
     setRightFencer: (fencer: Fencer) => set(() => ({ rightFencer: fencer })),
