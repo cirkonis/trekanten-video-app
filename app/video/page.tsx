@@ -9,7 +9,7 @@ import {FencerNameInputs} from "@/components/FencerNameInputs";
 import {TouchSequenceBuilder} from "@/components/TouchSequenceBuilder";
 import {TouchAwarded} from "@/components/TouchAwarded";
 import {PistePosition} from "@/components/PistePosition";
-import {TheVideoComponent} from "@/components/TheVideoComponent";
+import {TheVideoTimeComponent} from "@/components/TheVideoTimeComponent";
 
 export default function Video() {
 
@@ -38,7 +38,7 @@ export default function Video() {
     return (
         <div>
             <FencerNameInputs/>
-            <TheVideoComponent/>
+            <TheVideoTimeComponent/>
             <TouchSequenceBuilder/>
             <TouchAwarded/>
             <PistePosition/>

@@ -5,7 +5,7 @@ import {Time} from "@/types/time";
 import {FencingTime} from "@/components/FencingTime";
 const playerRef = React.createRef();
 
-export function TheVideoComponent(){
+export function TheVideoTimeComponent(){
     const [playing, setPlaying] = useState(false);
     const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
     // Use local state for timestamps to immediately reflect changes
