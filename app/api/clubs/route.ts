@@ -1,8 +1,5 @@
-import { executeNeo4jQuery } from '@/app/api/_Neo4j-Utilities/neo4jDriver';
-import { Club } from "@/types/club";
-import { User } from "@/types/user";
-import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
+import {executeNeo4jQuery} from '@/app/api/_Neo4j-Utilities/neo4jDriver';
+import {v4 as uuidv4} from 'uuid';
 import Joi from "joi";
 
 export async function GET(req: Request) {
@@ -15,13 +12,12 @@ export async function GET(req: Request) {
 
     if (neo4jResult.success && neo4jResult.data && neo4jResult.data.records) {
         const clubs = neo4jResult.data.records.map((record: any) => record.get(0).properties);
-        return new Response(JSON.stringify(clubs), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify(clubs), {status: 200, headers: {'Content-Type': 'application/json'}});
     } else {
         console.error('Failed to retrieve clubs:', neo4jResult);
-        return new Response('Internal Server Error', { status: 500 });
+        return new Response('Internal Server Error', {status: 500});
     }
 }
-
 
 
 export async function POST(req: Request) {
@@ -38,11 +34,11 @@ export async function POST(req: Request) {
     });
 
     // Validate the request body against the schema
-    const { error, value } = schema.validate(body);
+    const {error, value} = schema.validate(body);
 
     // If there is a validation error, return a 400 Bad Request response
     if (error) {
-        return new Response(JSON.stringify({ error: error.details[0].message }), {
+        return new Response(JSON.stringify({error: error.details[0].message}), {
             status: 400,
             headers: {
                 'Content-Type': 'application/json',
@@ -51,19 +47,32 @@ export async function POST(req: Request) {
     }
 
     const neo4jQuery = `
-    MATCH (u:User {id: $userId})
-    MERGE (c:Club {id: $id, name: $name})
-    MERGE (u)-[:HAS_CLUB]->(c)
-    RETURN c
-  `;
+MATCH (u:User {id: $userId})
+WITH u
+OPTIONAL MATCH (u)-[:HAS_CLUB]->(existingClub:Club {name: $name})
+WITH u, existingClub
+WHERE existingClub IS NULL
+MERGE (c:Club {id: $clubId, name: $name})
+MERGE (u)-[:HAS_CLUB]->(c)
+RETURN c
+`;
 
     const neo4jResult = await executeNeo4jQuery(neo4jQuery, {
         userId: value.user.id,
-        id: uuidv4(),
         name: value.name,
+        clubId: uuidv4(),
     });
 
-    if (neo4jResult.success && neo4jResult.data && neo4jResult.data.records) {
+    if (
+        neo4jResult &&
+        neo4jResult.success &&
+        neo4jResult.data &&
+        neo4jResult.data.records &&
+        neo4jResult.data.records.length > 0 &&
+        neo4jResult.data.records[0] &&
+        neo4jResult.data.records[0].get &&
+        neo4jResult.data.records[0].get(0)
+    ) {
         const createdClub = neo4jResult.data.records[0].get(0).properties;
         return new Response(JSON.stringify(createdClub), {
             status: 201,
@@ -88,11 +97,11 @@ export async function PUT(req: Request) {
     });
 
     // Validate the request body against the schema
-    const { error, value } = schema.validate(body);
+    const {error, value} = schema.validate(body);
 
     // If there is a validation error, return a 400 Bad Request response
     if (error) {
-        return new Response(JSON.stringify({ error: error.details[0].message }), {
+        return new Response(JSON.stringify({error: error.details[0].message}), {
             status: 400,
             headers: {
                 'Content-Type': 'application/json',
@@ -129,20 +138,19 @@ export async function PUT(req: Request) {
 }
 
 
-
 export async function DELETE(req: Request) {
-    const { id } = await req.json();
+    const {id} = await req.json();
 
     const schema = Joi.object({
         id: Joi.string().required(),
     });
 
     // Validate the request body against the schema
-    const { error, value } = schema.validate({ id });
+    const {error, value} = schema.validate({id});
 
     // If there is a validation error, return a 400 Bad Request response
     if (error) {
-        return new Response(JSON.stringify({ error: error.details[0].message }), {
+        return new Response(JSON.stringify({error: error.details[0].message}), {
             status: 400,
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +159,7 @@ export async function DELETE(req: Request) {
     }
 
     const neo4jQuery = 'MATCH (c:Club {id: $id}) DETACH DELETE c';
-    const neo4jResult = await executeNeo4jQuery(neo4jQuery, { id: value.id });
+    const neo4jResult = await executeNeo4jQuery(neo4jQuery, {id: value.id});
 
     if (neo4jResult.success) {
         return new Response(null, {
