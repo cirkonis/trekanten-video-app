@@ -1,6 +1,11 @@
 import {executeNeo4jQuery} from '@/app/api/_Neo4j-Utilities/neo4jDriver';
 import {v4 as uuidv4} from 'uuid';
 import Joi from "joi";
+import {createClub} from "@/app/api/clubs/queries/createClub";
+import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
+import {updateClub} from "@/app/api/clubs/queries/updateClub";
+import {deleteUser} from "@/app/api/users/queries/deleteUser";
+import {deleteClub} from "@/app/api/clubs/queries/deleteClub";
 
 export async function GET(req: Request) {
     const neo4jQuery = `
@@ -21,154 +26,36 @@ export async function GET(req: Request) {
 
 
 export async function POST(req: Request) {
-    const body = await req.json();
+    try {
+        const body = await req.json();
 
-    const schema = Joi.object({
-        name: Joi.string().required(),
-        user: Joi.object({
-            id: Joi.string(),
-            name: Joi.string().required(),
-            email: Joi.string().email().required(),
-            password: Joi.string().required(),
-        }).required(),
-    });
+        return await createClub(body)
 
-    // Validate the request body against the schema
-    const {error, value} = schema.validate(body);
-
-    // If there is a validation error, return a 400 Bad Request response
-    if (error) {
-        return new Response(JSON.stringify({error: error.details[0].message}), {
-            status: 400,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+    } catch (error) {
+        InternalError(error);
     }
 
-    const neo4jQuery = `
-MATCH (u:User {id: $userId})
-WITH u
-OPTIONAL MATCH (u)-[:HAS_CLUB]->(existingClub:Club {name: $name})
-WITH u, existingClub
-WHERE existingClub IS NULL
-MERGE (c:Club {id: $clubId, name: $name})
-MERGE (u)-[:HAS_CLUB]->(c)
-RETURN c
-`;
-
-    const neo4jResult = await executeNeo4jQuery(neo4jQuery, {
-        userId: value.user.id,
-        name: value.name,
-        clubId: uuidv4(),
-    });
-
-    if (
-        neo4jResult &&
-        neo4jResult.success &&
-        neo4jResult.data &&
-        neo4jResult.data.records &&
-        neo4jResult.data.records.length > 0 &&
-        neo4jResult.data.records[0] &&
-        neo4jResult.data.records[0].get &&
-        neo4jResult.data.records[0].get(0)
-    ) {
-        const createdClub = neo4jResult.data.records[0].get(0).properties;
-        return new Response(JSON.stringify(createdClub), {
-            status: 201,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-    } else {
-        console.error('Failed to create club:', neo4jResult);
-        return new Response('Internal Server Error', {
-            status: 500,
-        });
-    }
 }
 
 export async function PUT(req: Request) {
-    const body = await req.json();
+    try {
+        const body = await req.json();
 
-    const schema = Joi.object({
-        id: Joi.string().required(),
-        name: Joi.string().required(),
-    });
+        return await updateClub(body);
 
-    // Validate the request body against the schema
-    const {error, value} = schema.validate(body);
-
-    // If there is a validation error, return a 400 Bad Request response
-    if (error) {
-        return new Response(JSON.stringify({error: error.details[0].message}), {
-            status: 400,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-    }
-
-    const neo4jQuery = `
-        MATCH (c:Club {id: $id})
-        SET c.name = $name
-        RETURN c
-    `;
-
-    const neo4jResult = await executeNeo4jQuery(neo4jQuery, {
-        id: value.id,
-        name: value.name,
-    });
-
-    if (neo4jResult.success && neo4jResult.data && neo4jResult.data.records && neo4jResult.data.records.length > 0) {
-        const updatedClub = neo4jResult.data.records[0].get(0).properties;
-
-        return new Response(JSON.stringify(updatedClub), {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-    } else {
-        console.error('Failed to update club:', neo4jResult);
-        return new Response('Internal Server Error', {
-            status: 500,
-        });
+    } catch (error) {
+        InternalError(error);
     }
 }
 
 
 export async function DELETE(req: Request) {
-    const {id} = await req.json();
+        try {
+            const {id} = await req.json();
 
-    const schema = Joi.object({
-        id: Joi.string().required(),
-    });
+            return await deleteClub(id);
 
-    // Validate the request body against the schema
-    const {error, value} = schema.validate({id});
-
-    // If there is a validation error, return a 400 Bad Request response
-    if (error) {
-        return new Response(JSON.stringify({error: error.details[0].message}), {
-            status: 400,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-    }
-
-    const neo4jQuery = 'MATCH (c:Club {id: $id}) DETACH DELETE c';
-    const neo4jResult = await executeNeo4jQuery(neo4jQuery, {id: value.id});
-
-    if (neo4jResult.success) {
-        return new Response(null, {
-            status: 204,
-        });
-    } else {
-        console.error('Failed to delete club:', neo4jResult);
-        return new Response('Internal Server Error', {
-            status: 500,
-        });
-    }
+        }catch (error) {
+            return InternalError(error);
+        }
 }

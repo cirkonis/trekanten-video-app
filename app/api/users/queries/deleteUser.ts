@@ -1,5 +1,5 @@
 import Joi from "joi";
-import {getUserById} from "@/app/api/users/crud/getUserById";
+import {getUserById} from "@/app/api/users/queries/getUserById";
 import {executeNeo4jQuery} from "@/app/api/_Neo4j-Utilities/neo4jDriver";
 import {DoesntExist} from "@/app/api/_Error-Handlers/DoesntExist";
 import {BadRequest} from "@/app/api/_Error-Handlers/BadRequest";

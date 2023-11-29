@@ -2,7 +2,7 @@ import {executeNeo4jQuery} from "@/app/api/_Neo4j-Utilities/neo4jDriver";
 import {User} from "@/types/user";
 import {v4 as uuidv4} from 'uuid';
 import moment from 'moment';
-import {getUserByEmail} from "@/app/api/users/crud/getUserByEmail";
+import {getUserByEmail} from "@/app/api/users/queries/getUserByEmail";
 import {AlreadyExist} from "@/app/api/_Error-Handlers/AlreadyExist";
 
 export async function createUser(name: string, email: string, password: string): Promise<Response> {
