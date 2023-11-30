@@ -36,7 +36,7 @@ export async function executeNeo4jQuery(
         }
 
         console.error('Error executing Neo4j query:', error);
-        return { error: 'Internal Server Error' };
+        throw error;
     } finally {
         // Close the session
         await session.close();
