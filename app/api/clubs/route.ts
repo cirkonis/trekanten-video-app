@@ -1,10 +1,7 @@
 import {executeNeo4jQuery} from '@/app/api/_Neo4j-Utilities/neo4jDriver';
-import {v4 as uuidv4} from 'uuid';
-import Joi from "joi";
 import {createClub} from "@/app/api/clubs/queries/createClub";
 import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
 import {updateClub} from "@/app/api/clubs/queries/updateClub";
-import {deleteUser} from "@/app/api/users/queries/deleteUser";
 import {deleteClub} from "@/app/api/clubs/queries/deleteClub";
 
 export async function GET(req: Request) {

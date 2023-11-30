@@ -1,12 +1,8 @@
-import {executeNeo4jQuery} from '@/app/api/_Neo4j-Utilities/neo4jDriver';
-import Joi, {valid} from "joi";
 import {createUser} from "@/app/api/users/queries/createUser";
-import {getUserByEmail} from "@/app/api/users/queries/getUserByEmail";
-import {validateCrateUserBody, validateUpdateUserBody} from "@/app/api/users/validaters";
+import { validateUpdateUserBody} from "@/app/api/users/validaters";
 import {listUsers} from "@/app/api/users/queries/listUsers";
 import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
 import {updateUser} from "@/app/api/users/queries/updateUser";
-import {getUserById} from "@/app/api/users/queries/getUserById";
 import {deleteUser} from "@/app/api/users/queries/deleteUser";
 
 
@@ -29,9 +25,7 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        const validUser = await validateCrateUserBody(body);
-
-        return await createUser(validUser.name, validUser.email, validUser.password);
+        return await createUser(body);
 
     } catch (error) {
         InternalError(error);
