@@ -26,14 +26,12 @@ export function TouchAwarded() {
                     useVideoStore.getState().leftFencer,
                     useVideoStore.getState().rightFencer,
                 ]);
+                break;
+            case ETouchTypes.NO_TOUCH:
                 useTouchStore.getState().setTouchAgainst([
                     useVideoStore.getState().leftFencer,
                     useVideoStore.getState().rightFencer,
                 ]);
-                break;
-            case ETouchTypes.NO_TOUCH:
-                useTouchStore.getState().setPointAwardedTo([]);
-                useTouchStore.getState().setTouchAgainst([]);
                 break;
             default:
                 break;
