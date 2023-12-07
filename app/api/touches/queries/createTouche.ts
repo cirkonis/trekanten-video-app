@@ -6,6 +6,8 @@ import {v4 as uuidv4} from "uuid";
 import {Fencer} from "@/types/fencer";
 import {executeNeo4jQuery} from "@/app/api/_Neo4j-Utilities/neo4jDriver";
 import {ETouchTypes} from "@/enums/ETouchTypes";
+import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
+import {EPistePositions} from "@/enums/EPistePositions";
 
 export async function createTouch(touche: any): Promise<Response> {
     try {
@@ -21,12 +23,12 @@ export async function createTouch(touche: any): Promise<Response> {
                 id: Joi.string().uuid().required(),
                 name: Joi.string().required(),
             })).required(),
-            // sequence: Joi.array().items(Joi.string().valid(...Object.values(ETouchSequenceElements))).required(),
-            // videoStartTimeStamp: Joi.string().required(),
-            // videoEndTimeStamp: Joi.string(),
-            // fencingStartTime: Joi.string(),
-            // fencingEndTime: Joi.string(),
-            // position: Joi.string().valid(...Object.values(EPistePositions)).required(),
+            sequence: Joi.array().items(Joi.string().valid(...Object.values(ETouchSequenceElements))).required(),
+            videoStartTimeStamp: Joi.number().integer().min(0).required(),
+            videoEndTimeStamp: Joi.number().integer().min(0).required(),
+            fencingStartTime: Joi.number().integer().min(0).required(),
+            fencingEndTime: Joi.number().integer().min(0).required(),
+            position: Joi.string().valid(...Object.values(EPistePositions)).required(),
         });
 
         // Validate the request body against the schema
@@ -40,27 +42,25 @@ export async function createTouch(touche: any): Promise<Response> {
 
         let neo4jQuery: string;
 
-        console.log('HI', value.pointAwardedTo[0])
-
         switch (value.type) {
             case ETouchTypes.SINGLE_TOUCH_RIGHT:
             case ETouchTypes.SINGLE_TOUCH_LEFT:
                 neo4jQuery = `
-CREATE (touch:Touch $touchProperties)
-
-// Create relationships
-WITH touch
-// Match the awarded fencer by their id
-MATCH (awarded:Fencer {id: $awardedId})
-
-// Match the against fencer by their id
-MATCH (against:Fencer {id: $againstId})
-
-// Create relationships between touch and fencer nodes
-CREATE (awarded)<-[:POINT_AWARDED]-(touch)-[:TOUCH_AGAINST]->(against)
-
-// Return the created touch node
-RETURN touch
+                    CREATE (touch:Touch $touchProperties)
+                    
+                    // Create relationships
+                    WITH touch
+                    // Match the awarded fencer by their id
+                    MATCH (awarded:Fencer {id: $awardedId})
+                    
+                    // Match the against fencer by their id
+                    MATCH (against:Fencer {id: $againstId})
+                    
+                    // Create relationships between touch and fencer nodes
+                    CREATE (awarded)<-[:POINT_AWARDED]-(touch)-[:TOUCH_AGAINST]->(against)
+                    
+                    // Return the created touch node
+                    RETURN touch
         `;
                 break;
             case ETouchTypes.DOUBLE_TOUCH:
@@ -98,14 +98,13 @@ RETURN touch
         const neo4jResult = await executeNeo4jQuery(neo4jQuery, {
             touchProperties: {
                 id: uuidv4(),
-                name: value.type,
                 type: value.type,
-                // sequence: value.sequence,
-                // videoStartTimeStamp: value.videoStartTimeStamp,
-                // videoEndTimeStamp: value.videoEndTimeStamp,
-                // fencingStartTime: value.fencingStartTime,
-                // fencingEndTime: value.fencingEndTime,
-                // position: value.position,
+                sequence: value.sequence,
+                videoStartTimeStamp: value.videoStartTimeStamp,
+                videoEndTimeStamp: value.videoEndTimeStamp,
+                fencingStartTime: value.fencingStartTime,
+                fencingEndTime: value.fencingEndTime,
+                position: value.position,
             },
             awardedId: value.pointAwardedTo[0]?.id,  // Use optional chaining to handle potential undefined
             awardedId2: value.pointAwardedTo[1]?.id,     // Use optional chaining to handle potential undefined

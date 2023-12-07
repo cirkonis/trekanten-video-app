@@ -1,11 +1,11 @@
 import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
-import {createVideoNodes} from "@/app/api/videos/createVideoNodes";
+import {createVideo} from "@/app/api/videos/createVideo";
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
 
-        return await createVideoNodes(body);
+        return await createVideo(body);
 
     } catch (error) {
         InternalError(error);
