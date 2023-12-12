@@ -2,8 +2,7 @@ import { create } from 'zustand';
 import {Video} from "@/types/video";
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
-import {Time} from "@/types/time";
-import {formatTime} from "@/utils/FormatTime";
+import React from "react";
 
 export type VideoStoreActions = {
     addTouch: (touch: FencingTouch) => void;
@@ -14,12 +13,18 @@ export type VideoStoreActions = {
     setLeftFencer: (fencer: Fencer) => void;
     setRightFencer: (fencer: Fencer) => void;
     setTitle: (title: string) => void;
+    setUploadedVideo: (videoUrl: string) => void;
+    setPlayerRef: (ref: React.RefObject<any>) => void;
+    getPlayerRef: () => void;
     getTouches: () => void;
     resetVideo: () => void;
 };
 
 const initialVideoState: Video = {
-    title: "Video Title",
+    club: {
+        name: "Trekanten",
+    },
+    title: "",
     leftFencer: {
         name: "Left Fencer",
     },
@@ -27,10 +32,17 @@ const initialVideoState: Video = {
         name: "Right Fencer",
     },
     touches: [],
+    url: "",
 };
 
 export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
     ...initialVideoState,
+
+    setUploadedVideo: (videoUrl: string) => set(() => ({ url: videoUrl })),
+
+    setPlayerRef: (ref: React.RefObject<any>) => set(() => ({ playerRef: ref })),
+    getPlayerRef: () => set((state) => ({ playerRef: state.playerRef })),
+
 
     setTitle: (title: string) => set(() => ({ title: title })),
 

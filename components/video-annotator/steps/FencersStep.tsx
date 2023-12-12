@@ -1,7 +1,7 @@
 import { useVideoStore } from "@/state/videoState";
 import React from "react";
 
-export function FencerNameInputs() {
+export function FencersStep() {
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
 
