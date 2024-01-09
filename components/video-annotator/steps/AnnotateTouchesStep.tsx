@@ -49,7 +49,7 @@ export function AnnotateTouchesStep() {
 
     const handleSetStartTime = () => {
         if (playerRef.current) {
-            const currentTime = (playerRef.current as Player).getCurrentTime();
+            const currentTime = Math.round((playerRef.current as Player).getCurrentTime());
             useTouchStore.getState().setVideoStartTimeStamp(currentTime);
             const isValid = currentTime !== 0;
             setLocalValidation(isValid);

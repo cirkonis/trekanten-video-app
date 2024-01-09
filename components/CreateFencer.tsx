@@ -19,7 +19,6 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
 
 
     const handleConfirmCreate = async () => {
-        console.log("handleConfirmCreate");
         // TODO MM 12/23 add dynamic clubID
         try {
             // Make your API call to create a new fencer

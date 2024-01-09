@@ -21,6 +21,11 @@ export function HeaderNav() {
                                 Video Annotator
                             </Link>
                         </li>
+                        <li>
+                            <Link href="/videos">
+                                Videos
+                            </Link>
+                        </li>
                         <li><a>Fencers</a></li>
                         <li><a>Data</a></li>
                     </ul>

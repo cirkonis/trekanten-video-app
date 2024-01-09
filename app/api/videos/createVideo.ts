@@ -100,7 +100,6 @@ export async function createVideo(video: Video) {
                 try {
                     const touchResult = await createTouch({
                         ...touch,
-                        // Pass any additional parameters needed by createTouch function
                     });
                 } catch (error) {
                     console.error('Failed to create touch:', error);
