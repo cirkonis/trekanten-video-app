@@ -7,7 +7,11 @@ import {VideoStep} from "@/components/video-annotator/steps/VideoStep";
 import {AnnotateTouchesStep} from "@/components/video-annotator/steps/AnnotateTouchesStep";
 import {SubmitStep} from "@/components/video-annotator/steps/SubmitStep";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default function Video() {
+
     const currentStep = useStepStore((state) => state.currentStep);
     // const setCurrentStep = useStepStore((state) => state.setCurrentStep);
 

@@ -56,7 +56,8 @@ export function SubmitStep() {
             })
                 .then((res) => res.json())
                 .then(() =>  useVideoStore.getState().resetVideo())
-                .then(() => router.push('/'))
+                .then(() => setSaving(false))
+                .then(() => setStep(0))
                 .catch(() => {
                     console.error("Error saving video")
                 });
