@@ -1,4 +1,5 @@
 import "../app/globals.css";
+import {HeaderNav} from "@/components/HeaderNav";
 
 export const metadata = {
   title: 'Next.js',
@@ -12,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+      <HeaderNav></HeaderNav>
+      {children}
+      </body>
     </html>
   )
 }

@@ -6,6 +6,7 @@ import {Club} from "@/types/club";
 export type Video = {
     id?: string;
     url?: string;
+    playerRef?: any;
     club: Club;
     title: string;
     leftFencer: Fencer;
