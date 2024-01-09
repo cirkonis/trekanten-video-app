@@ -15,6 +15,7 @@ export type VideoStoreActions = {
     setTitle: (title: string) => void;
     setUploadedVideo: (videoUrl: string) => void;
     setPlayerRef: (ref: React.RefObject<any>) => void;
+
     getPlayerRef: () => void;
     getTouches: () => void;
     resetVideo: () => void;
@@ -23,6 +24,7 @@ export type VideoStoreActions = {
 const initialVideoState: Video = {
     club: {
         name: "Trekanten",
+        id: "9747fb19-5a24-4c8f-b049-78072dd70ff6"
     },
     title: "",
     leftFencer: {

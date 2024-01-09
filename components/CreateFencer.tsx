@@ -12,6 +12,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
         setLoading(true);
         const modal = document.getElementById('create-fencer-modal');
         if (modal) {
+            // @ts-ignore
             modal.showModal();
         }
     };
@@ -50,6 +51,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
             setLoading(false);
             const modal = document.getElementById('create-fencer-modal');
             if (modal) {
+                // @ts-ignore
                 modal.close(); // Close the modal
             }
         }

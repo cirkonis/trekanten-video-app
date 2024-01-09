@@ -2,17 +2,14 @@
 
 import React from "react";
 import { FencersStep } from "@/components/video-annotator/steps/FencersStep";
-import { TouchSequenceBuilder } from "@/components/TouchSequenceBuilder";
-import { TouchAwarded } from "@/components/TouchAwarded";
-import { PistePosition } from "@/components/PistePosition";
-import { Touches } from "@/components/Touches";
-import { AddTouch } from "@/components/AddTouch";
 import {useStepStore} from "@/state/annotationStepsState";
 import {VideoStep} from "@/components/video-annotator/steps/VideoStep";
+import {AnnotateTouchesStep} from "@/components/video-annotator/steps/AnnotateTouchesStep";
+import {SubmitStep} from "@/components/video-annotator/steps/SubmitStep";
 
 export default function Video() {
     const currentStep = useStepStore((state) => state.currentStep);
-    const setCurrentStep = useStepStore((state) => state.setCurrentStep);
+    // const setCurrentStep = useStepStore((state) => state.setCurrentStep);
 
     const steps = [
         { label: "Choose Video", components: [<VideoStep />] },
@@ -20,14 +17,10 @@ export default function Video() {
         {
             label: "Annotate Touches",
             components: [
-                <TouchSequenceBuilder />,
-                <TouchAwarded />,
-                <PistePosition />,
-                <AddTouch />,
-                <Touches />,
+                        <AnnotateTouchesStep />,
             ],
         },
-        { label: "Submit", components: [<div>Submit?</div>] },
+        { label: "Submit", components: [<SubmitStep />] },
     ];
 
     return (
@@ -38,7 +31,7 @@ export default function Video() {
                     <li
                         key={index}
                         className={`step ${index <= currentStep ? "step-primary" : ""}`}
-                        onClick={() => setCurrentStep(index)}
+                        // onClick={() => setCurrentStep(index)}
                     >
                         {step.label}
                     </li>

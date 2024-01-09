@@ -1,16 +1,20 @@
 import {useVideoStore} from "@/state/videoState";
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import Player from "react-player";
-import {Simulate} from "react-dom/test-utils";
 import {useStepStore} from "@/state/annotationStepsState";
-import playing = Simulate.playing;
 
 export function VideoStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
     const setUploadedVideo = useVideoStore((state) => state.setUploadedVideo);
-    const playerRef = useVideoStore((state) => state.playerRef);
     const videoTitle = useVideoStore((state) => state.title);
     const setStep = useStepStore((state) => state.setCurrentStep);
+
+    const playerRef = useRef<Player | null>(null);
+
+    useEffect(() => {
+        useVideoStore.getState().setPlayerRef(playerRef);
+    }, []);
+
 
     const setVideoTitle = (title: string) => {
         useVideoStore.getState().setTitle(title);
@@ -58,7 +62,7 @@ export function VideoStep() {
                         <Player
                             ref={playerRef}
                             url={uploadedVideo}
-                            onPlaying={playing}
+                            onPlaying={() => {}}
                             controls={true}
                         />
                     </div>

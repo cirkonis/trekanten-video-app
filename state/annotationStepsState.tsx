@@ -6,6 +6,6 @@ export type StepStore = {
 };
 
 export const useStepStore = create<StepStore>((set) => ({
-    currentStep: 1,
+    currentStep: 0,
     setCurrentStep: (step) => set({ currentStep: step }),
 }));

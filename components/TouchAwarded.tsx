@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { ETouchTypes } from '@/enums/ETouchTypes';
 import { useTouchStore } from '@/state/touchState';
 import { useVideoStore } from '@/state/videoState';
@@ -39,7 +38,7 @@ export function TouchAwarded() {
     };
 
     return (
-        <div className="my-4 p-4">
+        <div className="my-2 p-4 flex justify-center">
             <div className="flex">
                 {/* Touch Type Radio Buttons */}
                 <label className="mr-3 flex">
