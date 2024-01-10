@@ -31,14 +31,14 @@ export type TouchStoreActions = {
 };
 
 const initialTouchState: FencingTouch = {
-    type: ETouchTypes.NO_TOUCH,
+    type: null,
     pointAwardedTo: [],
     touchAgainst: [],
     sequence: [],
     videoStartTimeStamp: 0,
-    videoEndTimeStamp: 0,
-    fencingStartTime: 0,
-    fencingEndTime: 0,
+    // videoEndTimeStamp: 0,
+    // fencingStartTime: 0,
+    // fencingEndTime: 0,
     position: EPistePositions.CENTER_LINE,
 };
 

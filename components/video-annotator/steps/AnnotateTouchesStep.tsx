@@ -17,8 +17,9 @@ export function AnnotateTouchesStep() {
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
     const touchStartTime = useTouchStore(state => state.videoStartTimeStamp);
-    const [localValidation, setLocalValidation] = useState(false); // Local validation state
     const touches = useVideoStore((state) => state.touches);
+    const [alertMessage, setAlertMessage] = useState(""); // Alert message state
+    const [showAlert, setShowAlert] = useState(false);
     const setStep = useStepStore((state) => state.setCurrentStep);
 
 
@@ -51,8 +52,6 @@ export function AnnotateTouchesStep() {
         if (playerRef.current) {
             const currentTime = Math.round((playerRef.current as Player).getCurrentTime());
             useTouchStore.getState().setVideoStartTimeStamp(currentTime);
-            const isValid = currentTime !== 0;
-            setLocalValidation(isValid);
         }
     };
 
@@ -74,18 +73,50 @@ export function AnnotateTouchesStep() {
     }
 
     const handleNextStep = () => {
-        if (leftFencer && rightFencer) {
+        if (isVideoValid()) {
             setStep(3);
         } else {
             // Otherwise, display an error message or handle it as you see fit
-            console.error("Please select both left and right fencers.");
+            console.error("Please add a touch to the video before proceeding.");
         }
     };
 
-        const isVideoValid = () => {
-            const touches = useVideoStore.getState().touches;
-            return touches.length > 0;
+    const isVideoValid = () => {
+        const touches = useVideoStore.getState().touches;
+        return touches.length > 0;
+    }
+
+    function checkTouchValidity() {
+        const touchType = useTouchStore.getState().type;
+        const sequence = useTouchStore.getState().sequence;
+        const startTime = useTouchStore.getState().videoStartTimeStamp;
+        if (touchType !== null && sequence.length > 0 && startTime !== 0) {
+            addTouch();
+        } else {
+            // Display an alert message
+            setAlertMessage("Please fill out all touch information before adding.");
+            setShowAlert(true);
         }
+    }
+
+
+    function addTouch(){
+        useVideoStore.getState().addTouch({
+            type: useTouchStore.getState().type,
+            pointAwardedTo: useTouchStore.getState().pointAwardedTo,
+            touchAgainst: useTouchStore.getState().touchAgainst,
+            sequence: useTouchStore.getState().sequence,
+            videoStartTimeStamp: touchStartTime,
+            videoEndTimeStamp: useTouchStore.getState().videoEndTimeStamp,
+            fencingStartTime: useTouchStore.getState().fencingStartTime,
+            fencingEndTime: useTouchStore.getState().fencingEndTime,
+            position: useTouchStore.getState().position,
+        });
+        // Reset the touch state after adding
+        useTouchStore.getState().resetTouch();
+        setShowAlert(false);
+    }
+
 
     return (
         <div className="flex flex-col w-full pb-24">
@@ -131,31 +162,33 @@ export function AnnotateTouchesStep() {
             <div className="flex justify-center mt-8">
                 <button
                     className="btn btn-secondary btn-lg"
-                    onClick={() => {
-                        if (localValidation) {
-                            // If local validation is successful, add touch to the video touches array
-                            useVideoStore.getState().addTouch({
-                                type: useTouchStore.getState().type,
-                                pointAwardedTo: useTouchStore.getState().pointAwardedTo,
-                                touchAgainst: useTouchStore.getState().touchAgainst,
-                                sequence: useTouchStore.getState().sequence,
-                                videoStartTimeStamp: touchStartTime,
-                                videoEndTimeStamp: useTouchStore.getState().videoEndTimeStamp,
-                                fencingStartTime: useTouchStore.getState().fencingStartTime,
-                                fencingEndTime: useTouchStore.getState().fencingEndTime,
-                                position: useTouchStore.getState().position,
-                            });
-                            // Reset the touch state after adding
-                            useTouchStore.getState().resetTouch();
-                            // Reset local validation state
-                            setLocalValidation(false);
-                        }
+                    onClick={() => {checkTouchValidity()
                     }}
-                    disabled={!localValidation} // Disable the button if local validation fails
                 >
                     Add Touch
                 </button>
             </div>
+            {/* Daisy UI Alert */}
+            {showAlert && (
+                <div
+                    role="alert" className="alert alert-error my-2 mx-auto w-1/2 flex justify-center">
+                    <svg
+                        onClick={() => setShowAlert(false)}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-current shrink-0 h-6 w-6 cursor-pointer"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span>{alertMessage}</span>
+                </div>
+            )}
             <div className="divider"></div>
             {/* TOUCHES LIST */}
             <div>
