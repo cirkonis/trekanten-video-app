@@ -3,7 +3,7 @@ import { useTouchStore } from '@/state/touchState';
 import { useVideoStore } from '@/state/videoState';
 
 export function TouchAwarded() {
-    const touchType = useTouchStore(state => state.type);
+    const touchType = useTouchStore(state => state.type) || null;
     const leftFencer = useVideoStore(state => state.leftFencer);
     const rightFencer = useVideoStore(state => state.rightFencer);
 // ... (other state variables)

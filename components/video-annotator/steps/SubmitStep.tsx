@@ -26,6 +26,8 @@ export function SubmitStep() {
     }
 
     const handleSave = async () => {
+        const { id, club, title, leftFencer, rightFencer, touches } = video;
+        console.log({ id, club, title, leftFencer, rightFencer, touches } )
         const modal = document.getElementById('create-video-modal');
         if (modal) {
             // @ts-ignore

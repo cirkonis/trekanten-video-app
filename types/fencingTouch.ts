@@ -5,7 +5,7 @@ import {Fencer} from "@/types/fencer";
 
 export type FencingTouch = {
     id?: number;
-    type: ETouchTypes;
+    type: ETouchTypes | null;
     pointAwardedTo: Fencer[];
     touchAgainst: Fencer[];
     sequence: ETouchSequenceElements[];

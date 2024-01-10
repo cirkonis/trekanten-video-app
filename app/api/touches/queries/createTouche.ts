@@ -25,9 +25,9 @@ export async function createTouch(touche: any): Promise<Response> {
             })).required(),
             sequence: Joi.array().items(Joi.string().valid(...Object.values(ETouchSequenceElements))).required(),
             videoStartTimeStamp: Joi.number().integer().min(0).required(),
-            videoEndTimeStamp: Joi.number().integer().min(0).required(),
-            fencingStartTime: Joi.number().integer().min(0).required(),
-            fencingEndTime: Joi.number().integer().min(0).required(),
+            // videoEndTimeStamp: Joi.number().integer().min(0).required(),
+            // fencingStartTime: Joi.number().integer().min(0).required(),
+            // fencingEndTime: Joi.number().integer().min(0).required(),
             position: Joi.string().valid(...Object.values(EPistePositions)).required(),
         });
 
@@ -84,8 +84,8 @@ export async function createTouch(touche: any): Promise<Response> {
           
           // Create relationships
           WITH touch
-          MATCH (awarded:Fencer {id: $againstId}), (against:Fencer {id: $againstId2})
-          CREATE (awarded)<-[:NO_TOUCH_ACTION_WITH]-(touch)-[:NO_TOUCH_ACTION_WITH]->(against)
+          MATCH (fencer1:Fencer {id: $againstId}), (fencer2:Fencer {id: $againstId2})
+          CREATE (fencer1)<-[:NO_TOUCH_ACTION_WITH]-(touch)-[:NO_TOUCH_ACTION_WITH]->(fencer2)
           
           RETURN touch
         `;
