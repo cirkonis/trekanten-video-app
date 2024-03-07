@@ -3,6 +3,7 @@ import {Video} from "@/types/video";
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
 import React from "react";
+import {EVideoStatus} from "@/enums/EVideoStatus";
 
 export type VideoStoreActions = {
     addTouch: (touch: FencingTouch) => void;
@@ -15,6 +16,12 @@ export type VideoStoreActions = {
     setTitle: (title: string) => void;
     setUploadedVideo: (videoUrl: string) => void;
     setPlayerRef: (ref: React.RefObject<any>) => void;
+    getStatus: () => void;
+    setStatus: (status: EVideoStatus) => void;
+    getBucketUrl: () => void;
+    setBucketUrl: (url: string) => void;
+    getYouTubeUrl: () => void;
+    setYouTubeUrl: (url: string) => void;
 
     getPlayerRef: () => void;
     getTouches: () => void;
@@ -35,6 +42,9 @@ const initialVideoState: Video = {
     },
     touches: [],
     url: "",
+    bucketUrl: "",
+    youtubeUrl: "",
+    status: EVideoStatus.NEW,
 };
 
 export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
@@ -45,6 +55,14 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
     setPlayerRef: (ref: React.RefObject<any>) => set(() => ({ playerRef: ref })),
     getPlayerRef: () => set((state) => ({ playerRef: state.playerRef })),
 
+    getStatus: () => set((state) => ({ status: state.status })),
+    setStatus: (status: EVideoStatus) => set(() => ({ status: status })),
+
+    setBucketUrl: (url: string) => set(() => ({ bucketUrl: url })),
+    getBucketUrl: () => set((state) => ({ bucketUrl: state.bucketUrl })),
+
+    setYouTubeUrl: (url: string) => set(() => ({ youtubeUrl: url })),
+    getYouTubeUrl: () => set((state) => ({ youtubeUrl: state.youtubeUrl })),
 
     setTitle: (title: string) => set(() => ({ title: title })),
 

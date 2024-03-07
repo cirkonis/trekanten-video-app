@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "trekanten-video-app"
+  },
+  "targets": {},
+  "etags": {
+    "trekanten-video-app": {
+      "extensionInstances": {
+        "firestore-bigquery-export": "e04c25d56da92eb8ca73c763cfdd7bd5a3582d3910ccf09fc3a54438b66f6edf"
+      }
+    }
+  }
+}

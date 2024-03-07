@@ -1,13 +1,17 @@
 import {useVideoStore} from "@/state/videoState";
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Player from "react-player";
 import {useStepStore} from "@/state/annotationStepsState";
+import {saveDraftVideoToBucket} from "@/lib/saveDraftVideoToBucket";
 
 export function VideoStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
     const setUploadedVideo = useVideoStore((state) => state.setUploadedVideo);
     const videoTitle = useVideoStore((state) => state.title);
     const setStep = useStepStore((state) => state.setCurrentStep);
+
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Local state for the uploaded file
+
 
     const playerRef = useRef<Player | null>(null);
 
@@ -22,7 +26,9 @@ export function VideoStep() {
 
     const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files !== null && e.target.files.length > 0) {
-            setUploadedVideo(URL.createObjectURL(e.target.files[0]));
+            const file = e.target.files[0];
+            setUploadedVideo(URL.createObjectURL(file)); // Set the URL
+            setUploadedFile(file); // Update the uploaded file state
         } else {
             // TODO: Handle error
             console.log('Error uploading video');
@@ -36,6 +42,36 @@ export function VideoStep() {
             setStep(1);
         }
     };
+
+    const uploadVideo = async () => {
+        const videoTitle = useVideoStore.getState().title;
+        const videoFileUrl = useVideoStore.getState().url;
+
+        try {
+            // @ts-ignore
+            const response = await fetch(videoFileUrl);
+            const blob = await response.blob();
+
+            // Create FormData object to send both title and file
+            const formData = new FormData();
+            formData.append('title', videoTitle);
+            formData.append('description', "A video uploaded from the Fencing Time app");
+            formData.append('file', blob as Blob);
+
+            // Make your API call to upload the video
+            await fetch('/api/tube', {
+                method: 'POST',
+                body: formData,
+            })
+                .then((res) => res.json())
+                .catch(() => {
+                    console.error("Error uploading video");
+                });
+        } catch (error) {
+            console.error("Error uploading video:", error);
+        }
+    }
+
 
     return (
         <div>
@@ -76,6 +112,11 @@ export function VideoStep() {
             </div>
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
+                <button
+                    onClick={() => saveDraftVideoToBucket(uploadedFile as File, videoTitle as string)}
+                    className="btn btn-primary">
+                    Save to bucket
+                </button>
                 <button
                     className="btn btn-primary"
                     onClick={handleNextStep}
