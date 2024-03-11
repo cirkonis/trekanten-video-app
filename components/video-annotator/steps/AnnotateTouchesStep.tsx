@@ -9,6 +9,9 @@ import {PistePosition} from "@/components/PistePosition";
 import {ETouchTypes} from "@/enums/ETouchTypes";
 import {FencingTouch} from "@/types/fencingTouch";
 import {useStepStore} from "@/state/annotationStepsState";
+import {EVideoStatus} from "@/enums/EVideoStatus";
+import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
+import {Fencer} from "@/types/fencer";
 
 export function AnnotateTouchesStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
@@ -21,6 +24,7 @@ export function AnnotateTouchesStep() {
     const [alertMessage, setAlertMessage] = useState(""); // Alert message state
     const [showAlert, setShowAlert] = useState(false);
     const setStep = useStepStore((state) => state.setCurrentStep);
+    const [status, setStatus] = useState<EVideoStatus | null>(null);
 
 
     useEffect(() => {
@@ -62,14 +66,30 @@ export function AnnotateTouchesStep() {
     };
 
     // Sort touches by earliest video start time to latest video start time
-    const sortedTouches = [...touches].sort((a, b) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
+    const sortedTouches: any = [...touches].sort((a: any, b: any) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
 
     function compareTimes(timeA: number, timeB: number): number {
         return timeA - timeB;
     }
 
-    function handleRemoveTouch(touch: FencingTouch) {
+    async function handleRemoveTouch(touch: FencingTouch) {
         useVideoStore.getState().removeTouch(touch);
+        await updateDraftTouches()
+    }
+
+    async function updateDraftTouches() {
+        setStatus(EVideoStatus.SAVING_DRAFT);
+        const videoData = {
+            id: useVideoStore.getState().id,
+            touches: useVideoStore.getState().touches,
+        }
+        try {
+            await updateVideoData(videoData);
+            setStatus(EVideoStatus.SAVED_DRAFT);
+        } catch (e) {
+            setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
+            console.error("Error updating draft touches:", e);
+        }
     }
 
     const handleNextStep = () => {
@@ -100,7 +120,7 @@ export function AnnotateTouchesStep() {
     }
 
 
-    function addTouch(){
+    async function addTouch() {
         useVideoStore.getState().addTouch({
             type: useTouchStore.getState().type,
             pointAwardedTo: useTouchStore.getState().pointAwardedTo,
@@ -112,6 +132,7 @@ export function AnnotateTouchesStep() {
             fencingEndTime: useTouchStore.getState().fencingEndTime,
             position: useTouchStore.getState().position,
         });
+        await updateDraftTouches();
         // Reset the touch state after adding
         useTouchStore.getState().resetTouch();
         setShowAlert(false);
@@ -162,10 +183,12 @@ export function AnnotateTouchesStep() {
             <div className="flex justify-center mt-8">
                 <button
                     className="btn btn-secondary btn-lg"
-                    onClick={() => {checkTouchValidity()
+                    onClick={() => {
+                        checkTouchValidity()
                     }}
+                    disabled={status === EVideoStatus.SAVING_DRAFT}
                 >
-                    Add Touch
+                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Add Touch"}
                 </button>
             </div>
             {/* Daisy UI Alert */}
@@ -194,14 +217,14 @@ export function AnnotateTouchesStep() {
             <div>
                 <h1 className="text-2xl font-semibold px-8">Touches</h1>
                 <div>
-                    {sortedTouches.map((touch, index) => (
+                    {sortedTouches.map((touch: any, index: number) => (
                         <div className="w-full px-4" key={index}>
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-4">
                                     <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
                                     <p>{touch.type}</p>
                                     {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
-                                        <p>for {touch.pointAwardedTo.map((fencer) => fencer.name).join(', ')}</p>
+                                        <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
                                     ) : null}
                                     <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
                                     <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>

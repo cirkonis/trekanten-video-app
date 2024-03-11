@@ -4,6 +4,7 @@ import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
 import React from "react";
 import {EVideoStatus} from "@/enums/EVideoStatus";
+import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 
 export type VideoStoreActions = {
     addTouch: (touch: FencingTouch) => void;
@@ -18,11 +19,16 @@ export type VideoStoreActions = {
     setPlayerRef: (ref: React.RefObject<any>) => void;
     getStatus: () => void;
     setStatus: (status: EVideoStatus) => void;
+    getDraftStatus: () => void;
+    setDraftStatus: (status: EVideoDraftStatus) => void;
     getBucketUrl: () => void;
     setBucketUrl: (url: string) => void;
     getYouTubeUrl: () => void;
     setYouTubeUrl: (url: string) => void;
-
+    setVideoId: (videoId: string) => void;
+    getVideoId: () => void;
+    setFile: (file: File) => void;
+    getFile: () => void;
     getPlayerRef: () => void;
     getTouches: () => void;
     resetVideo: () => void;
@@ -45,6 +51,7 @@ const initialVideoState: Video = {
     bucketUrl: "",
     youtubeUrl: "",
     status: EVideoStatus.NEW,
+    draftStatus: EVideoDraftStatus.DRAFT_NOT_MADE,
 };
 
 export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
@@ -52,8 +59,14 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
 
     setUploadedVideo: (videoUrl: string) => set(() => ({ url: videoUrl })),
 
+    setFile: (file: File) => set(() => ({ file: file })),
+    getFile: () => set((state) => ({ file: state.file })),
+
     setPlayerRef: (ref: React.RefObject<any>) => set(() => ({ playerRef: ref })),
     getPlayerRef: () => set((state) => ({ playerRef: state.playerRef })),
+
+    setDraftStatus: (status: EVideoDraftStatus) => set(() => ({ draftStatus: status })),
+    getDraftStatus: () => set((state) => ({ draftStatus: state.draftStatus })),
 
     getStatus: () => set((state) => ({ status: state.status })),
     setStatus: (status: EVideoStatus) => set(() => ({ status: status })),
@@ -66,13 +79,16 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
 
     setTitle: (title: string) => set(() => ({ title: title })),
 
+    setVideoId: (videoId: string) => set(() => ({ id: videoId })),
+    getVideoId: () => set((state) => ({ id: state.id })),
+
     addTouch: (touch: FencingTouch) => set((state) => ({ touches: [...state.touches, touch] })),
     removeTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.filter((a) => a !== touch) })),
     editTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.map((a) => (a === touch ? touch : a)) })),
+    getTouches: () => set((state) => ({ touches: state.touches })),
 
     getLeftFencer: () => set((state) => ({ leftFencer: state.leftFencer })),
     getRightFencer: () => set((state) => ({ rightFencer: state.rightFencer })),
-    getTouches: () => set((state) => ({ touches: state.touches })),
 
     setLeftFencer: (fencer: Fencer) => set(() => ({ leftFencer: fencer })),
     setRightFencer: (fencer: Fencer) => set(() => ({ rightFencer: fencer })),

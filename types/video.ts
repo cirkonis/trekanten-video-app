@@ -1,6 +1,8 @@
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
 import {Club} from "@/types/club";
+import {EVideoStatus} from "@/enums/EVideoStatus";
+import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 
 
 export type Video = {
@@ -13,6 +15,8 @@ export type Video = {
     title: string;
     leftFencer: Fencer;
     rightFencer: Fencer;
-    touches: FencingTouch[];
-    status: EVideoStatus;
+    touches: FencingTouch[] | string;
+    status?: EVideoStatus;
+    draftStatus: EVideoDraftStatus;
+    file?: File;
 }

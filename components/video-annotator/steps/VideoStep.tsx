@@ -2,16 +2,20 @@ import {useVideoStore} from "@/state/videoState";
 import React, {useEffect, useRef, useState} from "react";
 import Player from "react-player";
 import {useStepStore} from "@/state/annotationStepsState";
-import {saveDraftVideoToBucket} from "@/lib/saveDraftVideoToBucket";
+import {EVideoStatus} from "@/enums/EVideoStatus";
+import {v4 as uuidv4} from 'uuid';
+import {createVideoData} from "@/lib/firestore/videos/createVideo";
+import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
+
 
 export function VideoStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
     const setUploadedVideo = useVideoStore((state) => state.setUploadedVideo);
     const videoTitle = useVideoStore((state) => state.title);
     const setStep = useStepStore((state) => state.setCurrentStep);
+    const [status, setStatus] = useState<EVideoStatus | null>(null);
 
     const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Local state for the uploaded file
-
 
     const playerRef = useRef<Player | null>(null);
 
@@ -29,48 +33,71 @@ export function VideoStep() {
             const file = e.target.files[0];
             setUploadedVideo(URL.createObjectURL(file)); // Set the URL
             setUploadedFile(file); // Update the uploaded file state
+            useVideoStore.getState().setFile(file);
         } else {
-            // TODO: Handle error
-            console.log('Error uploading video');
+            // TODO: Handle error with at least alert message
+            console.error('Error uploading video');
         }
     };
 
-    const handleNextStep = () => {
-        // Check if both video title and video are set
+    const handleNextStep = async () => {
         if (videoTitle && uploadedVideo) {
-            // If so, set the global step state to the select fencers step
-            setStep(1);
+            setStatus(EVideoStatus.SAVING_DRAFT);
+            useVideoStore.getState().setVideoId(uuidv4());
+            useVideoStore.getState().setBucketUrl(`videos/${useVideoStore.getState().id}/${useVideoStore.getState().title}`);
+            const videoData = {
+                id: useVideoStore.getState().id,
+                title: useVideoStore.getState().title,
+                leftFencer: useVideoStore.getState().leftFencer,
+                rightFencer: useVideoStore.getState().rightFencer,
+                touches: useVideoStore.getState().touches,
+                bucketUrl: useVideoStore.getState().bucketUrl,
+                youtubeUrl: 'Not yet uploaded',
+                draftStatus: EVideoDraftStatus.DRAFT_SAVED_WITH_NO_VIDEO,
+                club: useVideoStore.getState().club,
+            }
+            try {
+                await createVideoData(videoData);
+                setStatus(EVideoStatus.SAVED_DRAFT);
+                setStep(1);
+            } catch (e) {
+                setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
+                console.error("Error saving draft:", e);
+            }
         }
     };
 
-    const uploadVideo = async () => {
-        const videoTitle = useVideoStore.getState().title;
-        const videoFileUrl = useVideoStore.getState().url;
+    // TODO: Move this to a separate file
+    //     THIS IS THE UPLOAD TO YOUTUBE CODE, MOVE IT PLEASE    //
 
-        try {
-            // @ts-ignore
-            const response = await fetch(videoFileUrl);
-            const blob = await response.blob();
-
-            // Create FormData object to send both title and file
-            const formData = new FormData();
-            formData.append('title', videoTitle);
-            formData.append('description', "A video uploaded from the Fencing Time app");
-            formData.append('file', blob as Blob);
-
-            // Make your API call to upload the video
-            await fetch('/api/tube', {
-                method: 'POST',
-                body: formData,
-            })
-                .then((res) => res.json())
-                .catch(() => {
-                    console.error("Error uploading video");
-                });
-        } catch (error) {
-            console.error("Error uploading video:", error);
-        }
-    }
+    // const uploadVideo = async () => {
+    //     const videoTitle = useVideoStore.getState().title;
+    //     const videoFileUrl = useVideoStore.getState().url;
+    //
+    //     try {
+    //         // @ts-ignore
+    //         const response = await fetch(videoFileUrl);
+    //         const blob = await response.blob();
+    //
+    //         // Create FormData object to send both title and file
+    //         const formData = new FormData();
+    //         formData.append('title', videoTitle);
+    //         formData.append('description', "A video uploaded from the Fencing Time app");
+    //         formData.append('file', blob as Blob);
+    //
+    //         // Make your API call to upload the video
+    //         await fetch('/api/tube', {
+    //             method: 'POST',
+    //             body: formData,
+    //         })
+    //             .then((res) => res.json())
+    //             .catch(() => {
+    //                 console.error("Error uploading video");
+    //             });
+    //     } catch (error) {
+    //         console.error("Error uploading video:", error);
+    //     }
+    // }
 
 
     return (
@@ -82,6 +109,7 @@ export function VideoStep() {
                        className="input input-bordered w-full max-w-xs"
                        value={videoTitle}
                        onChange={(e) => setVideoTitle(e.target.value)}
+                       disabled={status === EVideoStatus.SAVING_DRAFT}
                        required
                 />
             </div>
@@ -98,7 +126,8 @@ export function VideoStep() {
                         <Player
                             ref={playerRef}
                             url={uploadedVideo}
-                            onPlaying={() => {}}
+                            onPlaying={() => {
+                            }}
                             controls={true}
                         />
                     </div>
@@ -107,22 +136,18 @@ export function VideoStep() {
                     type="file"
                     accept="video/*"
                     className="mt-6 file-input file-input-bordered w-full max-w-xs"
+                    disabled={status === EVideoStatus.SAVING_DRAFT}
                     onChange={handleVideoUpload}
                 />
             </div>
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
                 <button
-                    onClick={() => saveDraftVideoToBucket(uploadedFile as File, videoTitle as string)}
-                    className="btn btn-primary">
-                    Save to bucket
-                </button>
-                <button
                     className="btn btn-primary"
                     onClick={handleNextStep}
-                    disabled={!videoTitle || !uploadedVideo}
+                    disabled={!videoTitle || !uploadedVideo || status === EVideoStatus.SAVING_DRAFT}
                 >
-                    Next: Select Fencers
+                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Select Fencers"}
                 </button>
             </div>
         </div>

@@ -4,5 +4,7 @@ export enum EVideoStatus{
     NEW = 'New',
     SAVING_DRAFT = 'Saving Draft',
     SAVED_DRAFT = 'Saved Draft',
-    IN_ARCHIVE = 'In Archive',
+    FAILED_TO_SAVE_DRAFT = 'Failed to save draft',
+    FAILED_UPLOAD_TO_BUCKET = 'Failed to upload to bucket',
+    SAVED_VIDEO_TO_BUCKET = 'Saved video to bucket',
 }
