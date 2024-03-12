@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import {LoginForm} from "@/app/login/form";
+import {SignInForm} from "@/app/login/SignInForm";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
           </div>
           Welcome
           <div className="my-4">👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿</div>
-          <LoginForm/>
+          <SignInForm></SignInForm>
       </main>
   )
 }

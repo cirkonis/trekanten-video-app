@@ -67,39 +67,6 @@ export function VideoStep() {
         }
     };
 
-    // TODO: Move this to a separate file
-    //     THIS IS THE UPLOAD TO YOUTUBE CODE, MOVE IT PLEASE    //
-
-    // const uploadVideo = async () => {
-    //     const videoTitle = useVideoStore.getState().title;
-    //     const videoFileUrl = useVideoStore.getState().url;
-    //
-    //     try {
-    //         // @ts-ignore
-    //         const response = await fetch(videoFileUrl);
-    //         const blob = await response.blob();
-    //
-    //         // Create FormData object to send both title and file
-    //         const formData = new FormData();
-    //         formData.append('title', videoTitle);
-    //         formData.append('description', "A video uploaded from the Fencing Time app");
-    //         formData.append('file', blob as Blob);
-    //
-    //         // Make your API call to upload the video
-    //         await fetch('/api/tube', {
-    //             method: 'POST',
-    //             body: formData,
-    //         })
-    //             .then((res) => res.json())
-    //             .catch(() => {
-    //                 console.error("Error uploading video");
-    //             });
-    //     } catch (error) {
-    //         console.error("Error uploading video:", error);
-    //     }
-    // }
-
-
     return (
         <div>
             <div className="flex items-center w-full justify-start">

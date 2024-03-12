@@ -28,7 +28,6 @@ export async function updateVideoData(updatedVideoData: Partial<Video>) {
 
         // Update the document with the provided data
         await updateDoc(doc(docSnapshot.ref.firestore, "videos", docSnapshot.id), updatedVideoData);
-        console.log("Document updated successfully!");
     } catch (e) {
         console.error("Error updating document: ", e);
         throw e; // Throw the error for handling in the calling code

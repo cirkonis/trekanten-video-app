@@ -15,7 +15,6 @@ export async function createVideoData(video: Video) {
             draftStatus: video.draftStatus,
             club: video.club,
         });
-        console.log("Document written with ID: ", docRef.id);
         return true; // Return the ID of the created document
     } catch (e) {
         console.error("Error adding document: ", e);
