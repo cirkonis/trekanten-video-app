@@ -1,13 +1,19 @@
-// import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
-// import {uploadVideo} from "@/app/api/tube/uploadVideo";
-//
-// export async function POST(req: Request) {
-//     try {
-//         const body = await req.json();
-//         console.log(body);
-//         return await uploadVideo(body);
-//
-//     } catch (error) {
-//         InternalError(error);
-//     }
-// }
+import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
+import {getToken} from "next-auth/jwt";
+import {uploadToTheTube} from "@/app/api/tube/uploadToTheTube";
+import {NextRequest} from "next/server";
+
+const secret = process.env.NEXTAUTH_SECRET
+
+export async function POST(req: NextRequest) {
+    const token = await getToken({ req, secret })
+    console.log(token)
+    const body = await req.json()
+    const videoDetails = body
+    console.log('In the route',videoDetails)
+    try {
+        return uploadToTheTube(videoDetails, token)
+    } catch (error) {
+        InternalError(error);
+    }
+}

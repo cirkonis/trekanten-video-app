@@ -6,18 +6,13 @@ import {useStepStore} from "@/state/annotationStepsState";
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
 import {EVideoStatus} from "@/enums/EVideoStatus";
-import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
-import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 import {Spinner} from "@/components/Spinner";
-import {uploadVideoToYouTube} from "@/lib/youtube/uploadVideoToYouTube";
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
     const setStep = useStepStore((state) => state.setCurrentStep);
-    const video = useVideoStore((state) => state);
-    const [saving, setSaving] = useState<boolean>(false);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
 
     function compareTimes(timeA: number, timeB: number): number {
@@ -26,7 +21,7 @@ export function SubmitStep() {
 
     const touches = useVideoStore((state) => state.touches);
 
-    const sortedTouches = [...touches].sort((a, b) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
+    const sortedTouches: any[] = [...touches].sort((a: any, b: any) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
 
     function handleBackButton() {
         setStep(2);
@@ -51,7 +46,7 @@ export function SubmitStep() {
 
             // Get the fencer name
             let fencerName: string;
-            if(touch.pointAwardedTo.length > 0) {
+            if (touch.pointAwardedTo.length > 0) {
                 fencerName = touch.pointAwardedTo[0].name;
             } else {
                 fencerName = "No one";
@@ -68,46 +63,31 @@ export function SubmitStep() {
     }
 
     const finishVideo = async () => {
-        const videoTitle = useVideoStore.getState().title;
-        const videoFileUrl = useVideoStore.getState().url;
         try {
-            // @ts-ignore
-            const response = await fetch(videoFileUrl);
-            const blob = await response.blob();
+            const videoTitle = useVideoStore.getState().title;
             const description = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
-
-            // Create FormData object to send both title and file
-            const formData = new FormData();
-            formData.append('title', videoTitle);
-            formData.append('description', description);
-            formData.append('file', blob as Blob);
+            // const bucketUrl = useVideoStore.getState().bucketUrl;
+            const bucketUrl = "videos/test/fencing test.mp4";
 
 
-        //     // Make your API call to upload the video
-        //     await fetch('/api/tube', {
-        //         method: 'POST',
-        //         body: formData,
-        //     })
-        //         .then((res) => res.json())
-        //         .then((data) => {
-        //             console.log('Success:', data);
-        //         })
-        //         .catch(() => {
-        //             console.error("Error uploading video");
-        //         });
+            const videoDetails = {
+                title: videoTitle,
+                description: description,
+                bucketUrl: bucketUrl,
+            }
+            // Make your API call to upload the video
+            console.log('making the api call to upload the video');
+            await fetch('/api/tube', {
+                method: 'POST',
+                body: JSON.stringify(videoDetails),
+            })
+                .then((res) => res.json())
+                .catch(() => {
+                    console.error("Error uploading video");
+                });
         } catch (error) {
             console.error("Error uploading video:", error);
         }
-        setStatus(EVideoStatus.UPLOADED_TO_YOUTUBE);
-        // temprorary setting you tube url to chanel=
-        //TODO get video url back from http call and set that here
-        const youtubeUrl = 'https://www.youtube.com/watch?v=123456789';
-        const videoDataToUpdate = {
-            id: useVideoStore.getState().id,
-            youtubeUrl: youtubeUrl,
-            draftStatus: EVideoDraftStatus.NO_LONGER_A_DRAFT,
-        }
-        await updateVideoData(videoDataToUpdate);
     };
 
     const handleSave = async () => {
@@ -142,16 +122,18 @@ export function SubmitStep() {
                         <h3 className="font-bold text-lg">
                             {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" : "Are you sure 🤔"}
                         </h3>
-                        {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? <Spinner></Spinner> : <div className="divider"></div>}
+                        {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? <Spinner></Spinner> :
+                            <div className="divider"></div>}
                         <div className="modal-action flex w-full justify-between">
                             <form method="dialog">
                                 <button
                                     hidden={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
                                     disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
-                                    className="btn btn-danger">Nope</button>
+                                    className="btn btn-danger">Nope
+                                </button>
                             </form>
                             <button
-                                disabled = {status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
                                 className="btn btn-accent"
                                 onClick={() => handleConfirmSave()}>
                                 {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
@@ -187,5 +169,5 @@ export function SubmitStep() {
                 </div>
             </div>
         </div>
-)
+    )
 }

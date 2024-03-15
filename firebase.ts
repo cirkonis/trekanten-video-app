@@ -5,7 +5,7 @@ import {getAnalytics} from "@firebase/analytics";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDJuXZEFP_upRMzqb9Gtv9gbzZxGMUxKyc",
+    apiKey: process.env.FIREBASE_API_KEY,
     authDomain: "trekanten-video-app.firebaseapp.com",
     databaseURL: "https://trekanten-video-app-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "trekanten-video-app",
@@ -19,6 +19,6 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 
-export const storage = getStorage();
+export const storage = getStorage(app);
 
-const analytics = getAnalytics(app);
+// const analytics = getAnalytics(app);
