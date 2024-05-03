@@ -63,111 +63,123 @@ export function SubmitStep() {
     }
 
     const finishVideo = async () => {
+        const videoTitle = useVideoStore.getState().title;
+        const videoDescription = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
+        const videoFile = useVideoStore.getState().file;
+
+        let accessToken;
         try {
-            const videoTitle = useVideoStore.getState().title;
-            const description = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
-            // const bucketUrl = useVideoStore.getState().bucketUrl;
-            const bucketUrl = "videos/test/fencing test.mp4";
-
-
-            const videoDetails = {
-                title: videoTitle,
-                description: description,
-                bucketUrl: bucketUrl,
+            const tokenResponse = await fetch('/api/auth/token', {
+                method: 'GET',
+            });
+            if (!tokenResponse.ok) {
+                throw new Error('Failed to fetch token');
             }
+            const data = await tokenResponse.json();
+            accessToken = data.access_token;
+        } catch (error) {
+            console.error('Error fetching token:', error);
+        }
+
+        try {
             // Make your API call to upload the video
-            console.log('making the api call to upload the video');
+            const formData = new FormData();
+            formData.append('videoFile', videoFile as Blob);
+            formData.append('videoTitle', videoTitle);
+            formData.append('videoDescription', videoDescription);
+            formData.append('token', accessToken)
+
             await fetch('/api/tube', {
                 method: 'POST',
-                body: JSON.stringify(videoDetails),
+                body: formData,
             })
-                .then((res) => res.json())
+                .then((res) => console.log(res))
                 .catch(() => {
                     console.error("Error uploading video");
                 });
         } catch (error) {
             console.error("Error uploading video:", error);
         }
-    };
 
-    const handleSave = async () => {
-        const modal = document.getElementById('create-video-modal');
-        if (modal) {
-            // @ts-ignore
-            modal.showModal();
-        }
-    };
+    }
+            const handleSave = async () => {
+                const modal = document.getElementById('create-video-modal');
+                if (modal) {
+                    // @ts-ignore
+                    modal.showModal();
+                }
+            };
 
 
-    const handleConfirmSave = async () => {
-        setStatus(EVideoStatus.UPLOADING_TO_YOUTUBE);
-        await finishVideo();
-    };
+            const handleConfirmSave = async () => {
+                setStatus(EVideoStatus.UPLOADING_TO_YOUTUBE);
+                await finishVideo();
+            };
 
-    return (
-        <div>
-            <div className=" flex w-full justify-evenly mb-4">
-                <button
-                    onClick={handleBackButton}
-                    className="btn btn-secondary">
-                    Back
-                </button>
-                <button
-                    onClick={() => handleSave()}
-                    className="btn btn-primary">
-                    Save Video
-                </button>
-                <dialog id="create-video-modal" className="modal">
-                    <div className="modal-box flex flex-col w-full items-center">
-                        <h3 className="font-bold text-lg">
-                            {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" : "Are you sure 🤔"}
-                        </h3>
-                        {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? <Spinner></Spinner> :
-                            <div className="divider"></div>}
-                        <div className="modal-action flex w-full justify-between">
-                            <form method="dialog">
-                                <button
-                                    hidden={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
-                                    disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
-                                    className="btn btn-danger">Nope
-                                </button>
-                            </form>
-                            <button
-                                disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
-                                className="btn btn-accent"
-                                onClick={() => handleConfirmSave()}>
-                                {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
-                            </button>
-                        </div>
-                    </div>
-                </dialog>
-            </div>
-            <h1 className="text-2xl font-semibold px-8 mb-2">Video:
-                <span className="font-normal text-xl ml-2">{videoTitle}</span></h1>
-            <h1 className="text-2xl font-semibold px-8 mb-2">Fencers:
-                <span className="font-normal text-xl ml-2">{leftFencer.name} & {rightFencer.name}</span></h1>
-            {/* TOUCHES LIST */}
-            <div>
-                <h1 className="text-2xl font-semibold px-8 mb-2">Touches</h1>
-                <div className="px-10">
-                    {sortedTouches.map((touch: any, index: number) => (
-                        <div className="w-full px-4" key={index}>
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center space-x-4">
-                                    <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
-                                    <p>{touch.type}</p>
-                                    {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
-                                        <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
-                                    ) : null}
-                                    <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
-                                    <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
+            return (
+                <div>
+                    <div className=" flex w-full justify-evenly mb-4">
+                        <button
+                            onClick={handleBackButton}
+                            className="btn btn-secondary">
+                            Back
+                        </button>
+                        <button
+                            onClick={() => handleSave()}
+                            className="btn btn-primary">
+                            Save Video
+                        </button>
+                        <dialog id="create-video-modal" className="modal">
+                            <div className="modal-box flex flex-col w-full items-center">
+                                <h3 className="font-bold text-lg">
+                                    {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" : "Are you sure 🤔"}
+                                </h3>
+                                {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? <Spinner></Spinner> :
+                                    <div className="divider"></div>}
+                                <div className="modal-action flex w-full justify-between">
+                                    <form method="dialog">
+                                        <button
+                                            hidden={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                            disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                            className="btn btn-danger">Nope
+                                        </button>
+                                    </form>
+                                    <button
+                                        disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                        className="btn btn-accent"
+                                        onClick={() => handleConfirmSave()}>
+                                        {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
+                                    </button>
                                 </div>
                             </div>
-                            <div className="divider w-full"></div>
+                        </dialog>
+                    </div>
+                    <h1 className="text-2xl font-semibold px-8 mb-2">Video:
+                        <span className="font-normal text-xl ml-2">{videoTitle}</span></h1>
+                    <h1 className="text-2xl font-semibold px-8 mb-2">Fencers:
+                        <span className="font-normal text-xl ml-2">{leftFencer.name} & {rightFencer.name}</span></h1>
+                    {/* TOUCHES LIST */}
+                    <div>
+                        <h1 className="text-2xl font-semibold px-8 mb-2">Touches</h1>
+                        <div className="px-10">
+                            {sortedTouches.map((touch: any, index: number) => (
+                                <div className="w-full px-4" key={index}>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center space-x-4">
+                                            <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
+                                            <p>{touch.type}</p>
+                                            {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
+                                                <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
+                                            ) : null}
+                                            <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
+                                            <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
+                                        </div>
+                                    </div>
+                                    <div className="divider w-full"></div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
-            </div>
-        </div>
-    )
-}
+            )
+        }

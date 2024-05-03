@@ -83,8 +83,8 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
     getVideoId: () => set((state) => ({ id: state.id })),
 
     addTouch: (touch: FencingTouch) => set((state) => ({ touches: [...state.touches, touch] })),
-    removeTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.filter((a) => a !== touch) })),
-    editTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.map((a) => (a === touch ? touch : a)) })),
+    removeTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.filter((a: FencingTouch) => a !== touch) })),
+    editTouch: (touch: FencingTouch) => set((state) => ({ touches: state.touches.map((a: FencingTouch) => (a === touch ? touch : a)) })),
     getTouches: () => set((state) => ({ touches: state.touches })),
 
     getLeftFencer: () => set((state) => ({ leftFencer: state.leftFencer })),

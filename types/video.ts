@@ -15,7 +15,7 @@ export type Video = {
     title: string;
     leftFencer: Fencer;
     rightFencer: Fencer;
-    touches: FencingTouch[] | string;
+    touches: any;
     status?: EVideoStatus;
     draftStatus: EVideoDraftStatus;
     file?: File;

@@ -1,19 +1,21 @@
+// api/tube.ts
+import { uploadToTheTube } from '@/app/api/tube/uploadToTheTube';
 import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
-import {getToken} from "next-auth/jwt";
-import {uploadToTheTube} from "@/app/api/tube/uploadToTheTube";
-import {NextRequest} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 
-const secret = process.env.NEXTAUTH_SECRET
+export async function POST(req: NextRequest, res: NextResponse) {
+        try {
+            const formData = await req.formData();
+            const videoTitle = formData.get('videoTitle');
+            const videoDescription = formData.get('videoDescription');
+            const videoFile = formData.get('videoFile');
+            const token = formData.get('token');
 
-export async function POST(req: NextRequest) {
-    const token = await getToken({ req, secret })
-    console.log(token)
-    const body = await req.json()
-    const videoDetails = body
-    console.log('In the route',videoDetails)
-    try {
-        return uploadToTheTube(videoDetails, token)
-    } catch (error) {
-        InternalError(error);
-    }
+
+            return await uploadToTheTube(videoTitle, videoDescription, videoFile, token);
+
+        } catch (error) {
+            console.error('Error uploading video:', error);
+            return InternalError(error);
+        }
 }
