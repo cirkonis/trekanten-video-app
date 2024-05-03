@@ -1,13 +1,21 @@
 import {useVideoStore} from "@/state/videoState";
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Player from "react-player";
 import {useStepStore} from "@/state/annotationStepsState";
+import {EVideoStatus} from "@/enums/EVideoStatus";
+import {v4 as uuidv4} from 'uuid';
+import {createVideoData} from "@/lib/firestore/videos/createVideo";
+import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
+
 
 export function VideoStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
     const setUploadedVideo = useVideoStore((state) => state.setUploadedVideo);
     const videoTitle = useVideoStore((state) => state.title);
     const setStep = useStepStore((state) => state.setCurrentStep);
+    const [status, setStatus] = useState<EVideoStatus | null>(null);
+
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Local state for the uploaded file
 
     const playerRef = useRef<Player | null>(null);
 
@@ -22,18 +30,40 @@ export function VideoStep() {
 
     const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files !== null && e.target.files.length > 0) {
-            setUploadedVideo(URL.createObjectURL(e.target.files[0]));
+            const file = e.target.files[0];
+            setUploadedVideo(URL.createObjectURL(file)); // Set the URL
+            setUploadedFile(file); // Update the uploaded file state
+            useVideoStore.getState().setFile(file);
         } else {
-            // TODO: Handle error
-            console.log('Error uploading video');
+            // TODO: Handle error with at least alert message
+            console.error('Error uploading video');
         }
     };
 
-    const handleNextStep = () => {
-        // Check if both video title and video are set
+    const handleNextStep = async () => {
         if (videoTitle && uploadedVideo) {
-            // If so, set the global step state to the select fencers step
-            setStep(1);
+            setStatus(EVideoStatus.SAVING_DRAFT);
+            useVideoStore.getState().setVideoId(uuidv4());
+            useVideoStore.getState().setBucketUrl(`videos/${useVideoStore.getState().id}/${useVideoStore.getState().title}`);
+            const videoData = {
+                id: useVideoStore.getState().id,
+                title: useVideoStore.getState().title,
+                leftFencer: useVideoStore.getState().leftFencer,
+                rightFencer: useVideoStore.getState().rightFencer,
+                touches: useVideoStore.getState().touches,
+                bucketUrl: useVideoStore.getState().bucketUrl,
+                youtubeUrl: 'Not yet uploaded',
+                draftStatus: EVideoDraftStatus.DRAFT_SAVED_WITH_NO_VIDEO,
+                club: useVideoStore.getState().club,
+            }
+            try {
+                await createVideoData(videoData);
+                setStatus(EVideoStatus.SAVED_DRAFT);
+                setStep(1);
+            } catch (e) {
+                setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
+                console.error("Error saving draft:", e);
+            }
         }
     };
 
@@ -46,6 +76,7 @@ export function VideoStep() {
                        className="input input-bordered w-full max-w-xs"
                        value={videoTitle}
                        onChange={(e) => setVideoTitle(e.target.value)}
+                       disabled={status === EVideoStatus.SAVING_DRAFT}
                        required
                 />
             </div>
@@ -62,7 +93,8 @@ export function VideoStep() {
                         <Player
                             ref={playerRef}
                             url={uploadedVideo}
-                            onPlaying={() => {}}
+                            onPlaying={() => {
+                            }}
                             controls={true}
                         />
                     </div>
@@ -71,6 +103,7 @@ export function VideoStep() {
                     type="file"
                     accept="video/*"
                     className="mt-6 file-input file-input-bordered w-full max-w-xs"
+                    disabled={status === EVideoStatus.SAVING_DRAFT}
                     onChange={handleVideoUpload}
                 />
             </div>
@@ -79,9 +112,9 @@ export function VideoStep() {
                 <button
                     className="btn btn-primary"
                     onClick={handleNextStep}
-                    disabled={!videoTitle || !uploadedVideo}
+                    disabled={!videoTitle || !uploadedVideo || status === EVideoStatus.SAVING_DRAFT}
                 >
-                    Next: Select Fencers
+                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Select Fencers"}
                 </button>
             </div>
         </div>

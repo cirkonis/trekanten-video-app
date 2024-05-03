@@ -3,6 +3,11 @@ import {useVideoStore} from "@/state/videoState";
 import {Fencer} from "@/types/fencer";
 import {CreateFencer} from "@/components/CreateFencer";
 import {useStepStore} from "@/state/annotationStepsState";
+import {getFencers} from "@/lib/firestore/fencers/getFencers";
+import {v4 as uuidv4} from "uuid";
+import {addFencer} from "@/lib/firestore/fencers/addFencer";
+import {EVideoStatus} from "@/enums/EVideoStatus";
+import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
 
 export function FencersStep() {
     const [fencers, setFencers] = useState<Fencer[]>([]);
@@ -10,6 +15,8 @@ export function FencersStep() {
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
     const setStep = useStepStore((state) => state.setCurrentStep);
+    const [status, setStatus] = useState<EVideoStatus | null>(null);
+
 
     const setLeftFencer = (selectedFencerId: string) => {
         const selectedFencer = fencers.find((f) => f.id === selectedFencerId);
@@ -30,6 +37,11 @@ export function FencersStep() {
     };
 
     const handleCreateFencer = async (name: string) => {
+        try {
+            await addFencer({id: uuidv4(), name: name});
+        }catch (e) {
+            console.error('Error creating fencer:', e);
+        }
         // Notify parent component about the new fencer
         setFencers((prevFencers) => [...prevFencers, { id: "new-id", name }]); // Replace with actual fencer data
     };
@@ -44,35 +56,35 @@ export function FencersStep() {
         );
     };
 
-    const handleNextStep = () => {
-        if (leftFencer && rightFencer) {
+    const handleNextStep = async () => {
+        setStatus(EVideoStatus.SAVING_DRAFT);
+        const videoData = {
+            id: useVideoStore.getState().id,
+            leftFencer: useVideoStore.getState().leftFencer,
+            rightFencer: useVideoStore.getState().rightFencer,
+        }
+        try {
+            await updateVideoData(videoData);
+            setStatus(EVideoStatus.SAVED_DRAFT);
             setStep(2);
-        } else {
-            // Otherwise, display an error message or handle it as you see fit
-            console.error("Please select both left and right fencers.");
+
+        } catch (e) {
+            setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
+            console.error("Error saving draft:", e);
         }
     };
-
     useEffect(() => {
         const fetchFencersData = async () => {
             try {
-                const fencersData: Fencer[] = await fetch('/api/fencers', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                    .then((res) => res.json())
-                    .then((data) => data)
-                    .catch(() => []);
-                setFencers(fencersData); // Your API call to fetch fencers
+                const fencersData: Fencer[] = await getFencers();
+                setFencers(fencersData);
             } catch (error) {
                 console.error("Error fetching fencers:", error);
+            } finally {
+                setLoading(false); // This will run regardless of success or failure
             }
         };
-
-        fetchFencersData().then(() => setLoading(false));
+        fetchFencersData().then(r => r); // Invoke the function
     }, []); // Run once on component mount
 
     return (
@@ -94,6 +106,7 @@ export function FencersStep() {
                             className="select select-bordered"
                             defaultValue=""
                             onChange={(e) => setLeftFencer(e.target.value)}
+                            disabled={status === EVideoStatus.SAVING_DRAFT}
                         >
                             <option disabled value="">
                                 Select Fencer
@@ -114,6 +127,7 @@ export function FencersStep() {
                                 className="select select-bordered"
                                 defaultValue=""
                                 onChange={(e) => setRightFencer(e.target.value)}
+                                disabled={status === EVideoStatus.SAVING_DRAFT}
                             >
                                 <option disabled value="">
                                     Select Fencer
@@ -131,17 +145,19 @@ export function FencersStep() {
                 </div>
             )}
             <div className="divider w-full mx-8 font-bold">OR</div>
-            <div className="flex w-full flex-row justify-evenly items-center my-8">
-                <CreateFencer onCreate={handleCreateFencer} />
+            <div hidden={status === EVideoStatus.SAVING_DRAFT}
+                 className="flex w-full flex-row justify-evenly items-center my-8">
+                <CreateFencer
+                    onCreate={handleCreateFencer} />
             </div>
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
                 <button
                     className="btn btn-primary"
                     onClick={handleNextStep}
-                    disabled={!areSelectedFencersValid()}
+                    disabled={!areSelectedFencersValid() || status === EVideoStatus.SAVING_DRAFT}
                 >
-                    Next: Annotate Touches
+                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Annotate Touces"}
                 </button>
             </div>
         </div>
