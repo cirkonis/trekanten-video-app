@@ -93,28 +93,54 @@ export function SubmitStep() {
                 method: 'POST',
                 body: formData,
             })
-                .then((res) => console.log(res))
-                .catch(() => {
-                    console.error("Error uploading video");
+                .then((res) => {
+                    console.log(res)
+                    if (!res.ok) {
+                        throw new Error('Failed to upload video');
+                    }
+                    setStatus(EVideoStatus.UPLOADED_TO_YOUTUBE);
+                    const modal = document.getElementById('video-success-modal');
+                    if (modal) {
+                        // @ts-ignore
+                        modal.showModal();
+                    }
+                }
+                    )
+                .catch((error) => {
+                    console.error(error);
+                    setStatus(EVideoStatus.FAILED_UPLOAD_TO_YOUTUBE);
+                    const modal = document.getElementById('video-failed-modal');
+                    if (modal) {
+                        // @ts-ignore
+                        modal.showModal();
+                    }
                 });
         } catch (error) {
             console.error("Error uploading video:", error);
         }
+        finally {
+            return true;
+        }
 
     }
-            const handleSave = async () => {
-                const modal = document.getElementById('create-video-modal');
-                if (modal) {
-                    // @ts-ignore
-                    modal.showModal();
-                }
-            };
+    const handleSave = async () => {
+        const modal = document.getElementById('create-video-modal');
+        if (modal) {
+            // @ts-ignore
+            modal.showModal();
+        }
+    };
 
 
-            const handleConfirmSave = async () => {
-                setStatus(EVideoStatus.UPLOADING_TO_YOUTUBE);
-                await finishVideo();
-            };
+    const handleConfirmSave = async () => {
+        setStatus(EVideoStatus.UPLOADING_TO_YOUTUBE);
+        await finishVideo();
+    };
+
+    const handleStartOver = () => {
+        useVideoStore.getState().resetVideo();
+        useStepStore.getState().setCurrentStep (0);
+    }
 
             return (
                 <div>
@@ -127,7 +153,7 @@ export function SubmitStep() {
                         <button
                             onClick={() => handleSave()}
                             className="btn btn-primary">
-                            Save Video
+                            Send Video to YouTube 🚀 📺
                         </button>
                         <dialog id="create-video-modal" className="modal">
                             <div className="modal-box flex flex-col w-full items-center">
@@ -150,6 +176,36 @@ export function SubmitStep() {
                                         onClick={() => handleConfirmSave()}>
                                         {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
                                     </button>
+                                </div>
+                            </div>
+                        </dialog>
+                        {/* UPLOAD SUCCESSFUL */}
+                        <dialog id="video-success-modal" className="modal">
+                            <div className="modal-box flex flex-col w-full items-center">
+                                <h3 className="font-bold text-lg">
+                                    "WE DID IT!!! 🎉🎉🎉"
+                                </h3>
+                                <div className="modal-action flex w-full justify-center">
+                                    <button
+                                        className="btn btn-accent"
+                                        onClick={() => handleStartOver()}>
+                                        Let's do it again! 🤺
+                                    </button>
+                                </div>
+                            </div>
+                        </dialog>
+                        {/* UPLOAD FAILED MODAL */}
+                        <dialog id="video-failed-modal" className="modal">
+                            <div className="modal-box flex flex-col w-full items-center">
+                                <h3 className="font-bold text-lg">
+                                    It did not work 😡
+                                </h3>
+                                <div className="modal-action flex w-full justify-center">
+                                    <form method="dialog">
+                                        <button
+                                            className="btn btn-error">Damn it...
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </dialog>
