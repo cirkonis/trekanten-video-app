@@ -27,7 +27,8 @@ export async function uploadToTheTube(videoTitle: any, videoDescription: any,  v
                 tags: [], // Replace with an array of tags if needed
             },
             status: {
-                privacyStatus: 'private',
+                privacyStatus: 'public',
+                selfDeclaredMadeForKids: true,
             },
         };
 
