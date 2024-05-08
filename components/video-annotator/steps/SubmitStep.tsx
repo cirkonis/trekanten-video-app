@@ -67,6 +67,7 @@ export function SubmitStep() {
         const videoDescription = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
         const videoFile = useVideoStore.getState().file;
 
+        // TODO move this in the try catch block so it triggers the modal as well
         let accessToken;
         try {
             const tokenResponse = await fetch('/api/auth/token', {
