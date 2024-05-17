@@ -7,6 +7,7 @@ import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {Spinner} from "@/components/Spinner";
+import {useUserStore} from "@/state/usersState";
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -66,29 +67,18 @@ export function SubmitStep() {
         const videoTitle = useVideoStore.getState().title;
         const videoDescription = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
         const videoFile = useVideoStore.getState().file;
+        const accessToken = useUserStore.getState().token;
 
-        // TODO move this in the try catch block so it triggers the modal as well
-        let accessToken;
         try {
-            const tokenResponse = await fetch('/api/auth/token', {
-                method: 'GET',
-            });
-            if (!tokenResponse.ok) {
-                throw new Error('Failed to fetch token');
+            if (accessToken === null) {
+                throw new Error('No access token found');
             }
-            const data = await tokenResponse.json();
-            accessToken = data.access_token;
-        } catch (error) {
-            console.error('Error fetching token:', error);
-        }
-
-        try {
             // Make your API call to upload the video
             const formData = new FormData();
             formData.append('videoFile', videoFile as Blob);
             formData.append('videoTitle', videoTitle);
             formData.append('videoDescription', videoDescription);
-            formData.append('token', accessToken)
+            formData.append('token', String(accessToken))
 
             await fetch('/api/tube', {
                 method: 'POST',

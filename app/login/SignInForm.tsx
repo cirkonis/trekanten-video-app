@@ -1,26 +1,52 @@
 "use client"; // Indicates that this module is client-side code.
 
-import { signIn } from "next-auth/react"; // Import the signIn function from NextAuth for authentication.
-import { useSearchParams, useRouter } from "next/navigation"; // Import Next.js navigation utilities.
-import { ChangeEvent, useState } from "react"; // Import React hooks for managing component state.
+import {signInWithGooglePopup} from "@/firebase";
+import {GoogleAuthProvider} from "firebase/auth";
+import {useUserStore} from "@/state/usersState";
+import {User} from "@/types/user";
+import React, {useState} from "react";
+import Link from 'next/link';
 
 export function SignInForm() {
-    const [error, setError] = useState(""); // State for handling errors during authentication.
 
-    const searchParams = useSearchParams(); // Get query parameters from the URL.
-    const callbackUrl = searchParams.get("callbackUrl") || "/profile"; // Define a callback URL or use a default one.
+    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false);
 
-    const onSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent the default form submission behavior.
+    const logGoogleUser = async () => {
+        const response = await signInWithGooglePopup().then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            if (credential === null) {
+                throw new Error("No credential in result");
+            }
+            const token = credential.accessToken;
+            // The signed-in user info.
+            const user: User  = {
+                name: String(result.user.displayName),
+                email: String(result.user.email),
+                loggedIn: true,
+                token: token,
+            }
+            useUserStore.getState().setUser(user);
+            setUserLoggedIn(true);
+
+        }).catch((error) => {
+            // Handle Errors here.
+            const errorMessage = error.message;
+            const email = error.customData ? error.customData.email : 'Unknown';
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log(errorMessage, email, credential);
+        })
     }
+
     return (
-        <form onSubmit={onSubmit}>
-            {error && (
-                <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
+        <div>
+            {userLoggedIn ? (
+                <Link href="/video">Let's do some stuff</Link>
+            ) : (
+                <button onClick={logGoogleUser}>Sign In With Google</button>
             )}
-            <button className="btn btn-secondary" onClick={() => signIn("google", { callbackUrl })}>
-                Continue with Google
-            </button>
-        </form>
-    );
-};
+        </div>
+
+    )
+
+}
