@@ -14,11 +14,7 @@
 .gitignore
 
 /pages/
-/components/
-/app/
-/public/
-/enums/
-/lib/
+
 
 
 # Node.js dependencies:
