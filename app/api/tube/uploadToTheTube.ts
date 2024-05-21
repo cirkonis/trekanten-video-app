@@ -8,6 +8,7 @@ const CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET as string;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 export async function uploadToTheTube(videoTitle: any, videoDescription: any,  videoFile: any, token: any) {
+    console.log(token)
     try {
         // Create OAuth2 client
         const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);

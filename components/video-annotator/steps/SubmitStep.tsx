@@ -73,12 +73,13 @@ export function SubmitStep() {
             if (accessToken === null) {
                 throw new Error('No access token found');
             }
+
             // Make your API call to upload the video
             const formData = new FormData();
             formData.append('videoFile', videoFile as Blob);
             formData.append('videoTitle', videoTitle);
             formData.append('videoDescription', videoDescription);
-            formData.append('token', String(accessToken))
+            formData.append('token', String(accessToken));
 
             await fetch('/api/tube', {
                 method: 'POST',
