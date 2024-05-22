@@ -17,7 +17,10 @@ export default function UnprocessedVids() {
                 throw new Error('No access token found, Sign in to access this page');
             }
 
-            const res = await fetch('/api/tube/unprocessed', {
+
+            const playlistId = 'PLgDEtyTQ47rJAh0vMOchK4tNAxmf4wbGM';
+
+            const res = await fetch(`/api/tube/playlist?id=${playlistId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,

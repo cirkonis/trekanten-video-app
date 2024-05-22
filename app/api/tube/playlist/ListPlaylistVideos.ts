@@ -5,15 +5,13 @@ import {InternalError} from "@/app/api/_Error-Handlers/InternalError";
 const CLIENT_ID = process.env.YOUTUBE_CLIENT_ID as string;
 const CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET as string;
 const REDIRECT_URI = process.env.REDIRECT_URI;
-const PLAYLIST_ID = process.env.UNPROCESSED_VIDEOS_PLAYLIST_ID as string;
 
-export async function listUnprocessedVideos(accessToken: string) {
+export async function ListPlaylistVideos(accessToken: string, id: string) {
     try {
         // Create OAuth2 client
         const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
         oAuth2Client.setCredentials({access_token: accessToken});
-        console.log("LOOOOK HERHEHEHRHEREREE" + oAuth2Client)
         const youtube = google.youtube({
             version: 'v3',
             auth: oAuth2Client,
@@ -21,10 +19,8 @@ export async function listUnprocessedVideos(accessToken: string) {
 
         const res = await youtube.playlistItems.list({
             part: ['id', 'snippet', 'status'],
-               playlistId: PLAYLIST_ID,
+            playlistId: id,
         });
-
-        console.log(JSON.stringify(res))
 
         return new Response(JSON.stringify(res), {
             status: 201,
