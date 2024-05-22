@@ -1,15 +1,12 @@
-
 'use client'
 
 import {useEffect, useState} from "react";
 import {useUserStore} from "@/state/usersState";
 
 export default function UnprocessedVids() {
-    const [unprocessedVideos, setUnprocessedVideos] = useState(null);
+    const [unprocessedVideos, setUnprocessedVideos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const getUnprocessedVIds = async () => {
+    const getUnprocessedVideos = async () => {
         const accessToken = useUserStore.getState().token;
 
         try {
@@ -27,17 +24,23 @@ export default function UnprocessedVids() {
                 },
             })
 
-            if(!res.ok) {
+            if (!res.ok) {
                 throw new Error('Failed to fetch unprocessed videos');
             }
 
             const data = await res.json();
-            setUnprocessedVideos(data);
+            // Extracting only required properties
+            const formattedData = data.data.items.map((item: { snippet: any }) => ({
+                videoId: item.snippet.resourceId.videoId,
+                title: item.snippet.title,
+                publishedAt: item.snippet.publishedAt,
+                thumbnail: item.snippet.thumbnails.default.url,
+            }));
+            setUnprocessedVideos(formattedData);
 
         } catch (error) {
             console.error("Error getting unprocessed videos:", error);
-        }
-        finally {
+        } finally {
             return true;
         }
 
@@ -45,21 +48,58 @@ export default function UnprocessedVids() {
 
 
     useEffect(() => {
-        getUnprocessedVIds().then(r => setLoading(false));
+        getUnprocessedVideos().then(r => setLoading(false));
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
 
     return (
         <div>
-            <h1>Unprocessed Videos</h1>
-            <pre>{JSON.stringify(unprocessedVideos, null, 2)}</pre>
+            {loading && <div>Loading...</div>}
+            <div>
+                <h1>Unprocessed Videos</h1>
+                {unprocessedVideos ? (
+                    <div className="overflow-x-auto">
+                        <table className="table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Video ID</th>
+                                <th>Published At</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {unprocessedVideos.map(video => (
+                                <tr key={video.videoId}>
+                                    <td>
+                                        <div className="flex items-center gap-3">
+                                            <div className="avatar">
+                                                <div className="mask mask-squircle w-12 h-12">
+                                                    <img src={video.thumbnail} alt="Thumbnail"/>
+                                                </div>
+                                            </div>
+                                            <div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{video.title}</td>
+                                    <td>
+                                        <a className="link accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View on YouTube 📺</a>
+                                    </td>
+                                    <td>{new Date(video.publishedAt).toLocaleString()}</td>
+                                    <td>
+                                        <button className="btn btn-secondary">Get to work 🤺</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div>No unprocessed videos found.</div>
+                )}
+            </div>
         </div>
     );
 };
