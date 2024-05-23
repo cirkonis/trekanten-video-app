@@ -40,11 +40,6 @@ export function HeaderNav() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/finished-videos" onClick={closeDropdown}>
-                                    Finished Videos
-                                </Link>
-                            </li>
-                            <li>
                                 <Link href="/fencers" onClick={closeDropdown}>
                                     Fencers
                                 </Link>

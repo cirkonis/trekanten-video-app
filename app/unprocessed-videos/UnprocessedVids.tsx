@@ -4,27 +4,38 @@ import React, {MouseEventHandler, useEffect, useState} from "react";
 import {useUserStore} from "@/state/usersState";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
+import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
 
 
 export default function UnprocessedVids() {
     const [unprocessedVideos, setUnprocessedVideos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [disabled, setDisabled] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+
+
+    const handleCloseAlert = () => {
+        setShowAlert(false);
+    };
+
     const getUnprocessedVideos = async () => {
-        const accessToken = useUserStore.getState().token;
-
+        setLoading(true);
         try {
-            if (accessToken === null) {
-                throw new Error('No access token found, Sign in to access this page');
+            const token = useUserStore.getState().token;
+            if (!token) {
+                setShowAlert(true);
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 3000);
+                throw new Error('User is not logged in');
             }
-
 
             const playlistId = 'PLgDEtyTQ47rJAh0vMOchK4tNAxmf4wbGM';
 
             const res = await fetch(`/api/tube/playlist?id=${playlistId}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+                    'Authorization': `Bearer ${token}`,
                 },
             })
 
@@ -56,13 +67,18 @@ export default function UnprocessedVids() {
     }, []);
 
 
-    function handleGetToWork(videoTitle: string, videoId: string): MouseEventHandler<HTMLButtonElement> {
-        return () => {
-            setDisabled(true);
-            setLoading(true);
-            useVideoStore.getState().setYouTubeVideoId(videoId);
-            useVideoStore.getState().setTitle(videoTitle);
-        };
+    function handleGetToWork(videoTitle: string, videoId: string) {
+            return () => {
+                setDisabled(true);
+                useVideoStore.getState().setYouTubeVideoId(videoId);
+                useVideoStore.getState().setTitle(videoTitle);
+
+                const modal = document.getElementById('confirm-modal');
+                if (modal) {
+                    // @ts-ignore
+                    modal.showModal();
+                }
+            }
     }
 
     return (
@@ -101,13 +117,13 @@ export default function UnprocessedVids() {
                                     </td>
                                     <td>{video.title}</td>
                                     <td>
-                                        <a className="link-accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View on YouTube 📺</a>
+                                        <a className="link-accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View
+                                            on YouTube 📺</a>
                                     </td>
                                     <td>{new Date(video.publishedAt).toLocaleString()}</td>
-                                    {/*TODO REPLACE THIS WITH A MODAL POP UP SO WE CAN HAVE A CLIENT SIDE LINK TO ANNOTATE*/}
                                     <td>
                                         <button disabled={disabled} onClick={handleGetToWork(video.title, video.videoId)} className="btn btn-primary">
-                                            <Link href="/annotate-video">Get to work 🤺</Link>
+                                           Get to work 🤺
                                         </button>
                                     </td>
                                 </tr>
@@ -119,6 +135,25 @@ export default function UnprocessedVids() {
                     <div>No unprocessed videos found.</div>
                 )}
             </div>
+            <div>
+                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+            </div>
+            <dialog id="confirm-modal" className="modal">
+                <div className="modal-box flex flex-col w-full">
+                    <h3 className="font-bold text-lg">Ready to fix this up</h3>
+                    <div className="py-4">
+                        <span className="">{useVideoStore.getState().title} </span>
+                    </div>
+                    <div className="modal-action flex w-full justify-between">
+                        <form method="dialog">
+                            <button className="btn btn-danger">Changed my mind 🙅</button>
+                        </form>
+                        <Link className="btn btn-accent" href="/annotate-video">
+                            let's do it! 🤺
+                        </Link>
+                    </div>
+                </div>
+            </dialog>
         </div>
     );
 };

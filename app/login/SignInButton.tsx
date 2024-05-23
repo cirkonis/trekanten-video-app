@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 export function SignInButton() {
 
-    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false);
+    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(useUserStore.getState().loggedIn || false );
 
     // Define the required scopes
     const SCOPES = [

@@ -9,7 +9,6 @@ export type Video = {
     url?: string;
     youtubeVideoId?: string;
     youtubeUrl?: string;
-    playerRef?: any;
     club: Club;
     title: string;
     leftFencer: Fencer;

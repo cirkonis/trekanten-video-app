@@ -1,18 +1,30 @@
 'use client';
 
 import React from "react";
-import {SignInButton} from "@/app/login/SignInButton";
-import {HeaderNav} from "@/components/HeaderNav";
+import { useUserStore } from "@/state/usersState";
+import Link from "next/link";
+import {YouTubeChannelButton} from "@/components/YouTubeChannelButton";
 
 export default function Home() {
-  return (
-      <main className="flex min-h-screen flex-col items-center p-24 text-pink-500">
-          <div className="navbar-center">
-              <a className="btn btn-ghost text-xl">Trekanten Video App</a>
-          </div>
-          Welcome
-          <div className="my-4">👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿</div>
-          <SignInButton></SignInButton>
-      </main>
-  )
+    // Subscribe to loggedIn state
+    const userLoggedIn = useUserStore(state => state.loggedIn);
+
+    return (
+        <main className="flex min-h-screen flex-col items-center text-pink-500">
+            <div className="navbar-center">
+            </div>
+            {userLoggedIn ? (
+                <div className="flex flex-col items-center">
+                    <h1>Welcome</h1>
+                    <div className="flex justify-evenly my-6">
+                    <Link className="btn btn-warning mx-2" href="/unprocessed-videos">New Videos</Link>
+                    <Link className="btn btn-info mx-2" href="/fencers">Fencers</Link>
+                    <YouTubeChannelButton></YouTubeChannelButton>
+                    </div>
+                </div>
+            ) : (
+                <h1>Welcome</h1>
+            )}
+        </main>
+    );
 }

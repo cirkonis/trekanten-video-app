@@ -16,7 +16,6 @@ export type VideoStoreActions = {
     setRightFencer: (fencer: Fencer) => void;
     setTitle: (title: string) => void;
     setUploadedVideo: (videoUrl: string) => void;
-    setPlayerRef: (ref: React.RefObject<any>) => void;
     getStatus: () => void;
     setStatus: (status: EVideoStatus) => void;
     getDraftStatus: () => void;
@@ -29,7 +28,6 @@ export type VideoStoreActions = {
     getVideoId: () => void;
     setFile: (file: File) => void;
     getFile: () => void;
-    getPlayerRef: () => void;
     getTouches: () => void;
     resetVideo: () => void;
 };
@@ -61,9 +59,6 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
 
     setFile: (file: File) => set(() => ({ file: file })),
     getFile: () => set((state) => ({ file: state.file })),
-
-    setPlayerRef: (ref: React.RefObject<any>) => set(() => ({ playerRef: ref })),
-    getPlayerRef: () => set((state) => ({ playerRef: state.playerRef })),
 
     setDraftStatus: (status: EVideoDraftStatus) => set(() => ({ draftStatus: status })),
     getDraftStatus: () => set((state) => ({ draftStatus: state.draftStatus })),

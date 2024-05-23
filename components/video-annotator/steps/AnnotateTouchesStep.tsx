@@ -1,5 +1,5 @@
 import Player from "react-player";
-import React, {useEffect, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useVideoStore} from "@/state/videoState";
 import {useTouchStore} from "@/state/touchState";
 import {formatTime} from "@/utils/FormatTime";
@@ -15,8 +15,6 @@ import {Fencer} from "@/types/fencer";
 import YouTubePlayer from "@/components/YouTubePlayer";
 
 export function AnnotateTouchesStep() {
-    const uploadedVideo = useVideoStore((state) => state.url);
-    const playerRef = useVideoStore((state) => state.playerRef);
     const videoTitle = useVideoStore((state) => state.title);
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
@@ -26,19 +24,6 @@ export function AnnotateTouchesStep() {
     const [showAlert, setShowAlert] = useState(false);
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
-
-    const handleSetStartTime = () => {
-        if (playerRef.current) {
-            const currentTime = Math.round((playerRef.current as Player).getCurrentTime());
-            useTouchStore.getState().setVideoStartTimeStamp(currentTime);
-        }
-    };
-
-    const handleSeekToTouch = (startTimeStamp: number) => {
-        if (playerRef.current) {
-            playerRef.current.seekTo(startTimeStamp);
-        }
-    };
 
     // Sort touches by earliest video start time to latest video start time
     const sortedTouches: any = [...touches].sort((a: any, b: any) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
@@ -131,18 +116,7 @@ export function AnnotateTouchesStep() {
                     <p>{leftFencer.name}</p>
                     <p>{rightFencer.name}</p>
                 </div>
-            <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
-            </div>
-            <div className="divider"></div>
-            <div className="flex justify-evenly">
-                <div className="flex flex-col items-center justify-center">
-                    <div className="flex flex-row items-center mb-4">
-                        <div>Touch start time:</div>
-                        <div className="text-xl mx-2">{formatTime(touchStartTime)} </div>
-                    </div>
-                    <button className="btn btn-accent btn-sm mx-4" onClick={handleSetStartTime}>Set Touch Start Time
-                    </button>
-                </div>
+                <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
             </div>
             <div className="divider"></div>
             <TouchSequenceBuilder/>
@@ -198,12 +172,6 @@ export function AnnotateTouchesStep() {
                                     <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
                                     <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
                                 </div>
-                                <button
-                                    className="btn btn-info btn-circle btn-small"
-                                    onClick={() => handleSeekToTouch(touch.videoStartTimeStamp)}
-                                >
-                                    Seek To
-                                </button>
                                 <button className="btn btn-warning btn-circle btn-small" onClick={() => handleRemoveTouch(touch)}>🗑️</button>
                             </div>
                             <div className="divider w-full"></div>

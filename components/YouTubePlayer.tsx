@@ -1,7 +1,10 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useTouchStore} from "@/state/touchState";
+import {useStepStore} from "@/state/annotationStepsState";
+import {formatTime} from "@/utils/FormatTime";
+import {useVideoStore} from "@/state/videoState";
 
 declare global {
     interface Window {
@@ -14,12 +17,13 @@ interface YouTubePlayerProps {
     videoId: string;
 }
 
-const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
+const YouTubePlayer: React.FC<YouTubePlayerProps> = ({videoId}) => {
     const playerRef = useRef<HTMLDivElement | null>(null);
     const playerInstance = useRef<any>(null);
     const done = useRef(false);
+    const touchStartTime = useTouchStore(state => state.videoStartTimeStamp);
 
-    const getCurrentTime = () => {
+    const handleSetStartTime = () => {
         if (playerInstance.current) {
             const time = playerInstance.current.getCurrentTime();
             const currentTime = Math.round(time);
@@ -27,6 +31,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
             console.log(useTouchStore.getState().videoStartTimeStamp);
         }
     };
+
 
     useEffect(() => {
         const loadYouTubeIframeAPI = () => {
@@ -86,8 +91,24 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     return (
         <div>
             <div ref={playerRef}></div>
-            <button onClick={getCurrentTime}>Get Current Time</button>
-            <p>{useTouchStore.getState().videoStartTimeStamp}</p>
+            {useStepStore.getState().currentStep !== 2 ? (
+                <p></p>
+            ) : (
+                <>
+                    <div className="divider"></div>
+                    <div className="flex justify-evenly">
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="flex flex-row items-center mb-4">
+                                <div>Touch start time:</div>
+                                <div className="text-xl mx-2">{formatTime(touchStartTime)} </div>
+                            </div>
+                            <button className="btn btn-accent btn-sm mx-4" onClick={handleSetStartTime}>Set Touch Start
+                                Time
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
