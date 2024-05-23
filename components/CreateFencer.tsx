@@ -3,6 +3,7 @@ import {addFencer} from "@/lib/firestore/fencers/addFencer";
 import {Fencer} from "@/types/fencer";
 ;import { v4 as uuidv4 } from 'uuid';
 import {useUserStore} from "@/state/usersState";
+import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
 
 interface CreateFencerProps {
     onCreate: (name: string) => void;
@@ -11,6 +12,11 @@ interface CreateFencerProps {
 export function CreateFencer({onCreate}: CreateFencerProps) {
     const [name, setName] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [showAlert, setShowAlert] = useState(false);
+
+    const handleCloseAlert = () => {
+        setShowAlert(false);
+    };
 
     const handleCreate = async () => {
         const modal = document.getElementById('create-fencer-modal');
@@ -26,6 +32,10 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
             setLoading(true)
             const token = useUserStore.getState().token;
             if (!token) {
+                setShowAlert(true);
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 3000);
                 throw new Error('User is not logged in');
             }
 
@@ -53,6 +63,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
 
            await addFencer(newFencer);
            setName("");
+           onCreate(name);
 
         } catch (error) {
             console.error("Error creating fencer:", error);
@@ -94,11 +105,14 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
                                 <button className="btn btn-danger">Nope</button>
                             </form>
                             <button className="btn btn-accent" onClick={() => handleConfirmCreate()}>
-                                {!loading ? "Creating..." : "Create Fencer"}
+                                {loading ? "Creating..." : "Create Fencer"}
                             </button>
                         </div>
                     </div>
                 </dialog>
+            </div>
+            <div>
+                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
             </div>
         </div>
     );

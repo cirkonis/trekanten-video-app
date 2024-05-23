@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {getFencers} from "@/lib/firestore/fencers/getFencers";
 import {Fencer} from "@/types/fencer";
 import {CreateFencer} from "@/components/CreateFencer";
+import Link from "next/link";
 
 export default function FencersTable() {
     const [fencers, setFencers] = useState<Fencer[]>([]);
@@ -51,16 +52,29 @@ export default function FencersTable() {
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Weapon</th>
-                        <th>Playlist ID</th>
+                        <th>YouTube Playlist</th>
+                        <th>Finished Videos</th>
+                        <th>Fencer Data</th>
                     </tr>
                     </thead>
                     <tbody>
                     {fencers.map((fencer) => (
                         <tr key={fencer.id}>
                             <td>{fencer.name}</td>
-                            <td>{fencer.weapon}</td>
-                            <td>{fencer.playlistId}</td>
+                            <td>
+                                <a className="link-accent" href={`https://www.youtube.com/playlist?list=${fencer.playlistId}`} target="_blank">View
+                                    on YouTube 📺</a>
+                            </td>
+                            <td className="text-gray-400">
+                                <Link href={``}>
+                                    View Finished Videos
+                                </Link>
+                            </td>
+                            <td className="text-gray-400">
+                                <Link href={``}>
+                                    View Fencer Data
+                                </Link>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
