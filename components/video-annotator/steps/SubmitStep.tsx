@@ -8,6 +8,7 @@ import {FencingTouch} from "@/types/fencingTouch";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {Spinner} from "@/components/Spinner";
 import {useUserStore} from "@/state/usersState";
+import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -15,6 +16,13 @@ export function SubmitStep() {
     const rightFencer = useVideoStore((state) => state.rightFencer);
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
+
+    const [showAlert, setShowAlert] = useState(false);
+
+
+    const handleCloseAlert = () => {
+        setShowAlert(false);
+    };
 
     function compareTimes(timeA: number, timeB: number): number {
         return timeA - timeB;
@@ -63,52 +71,43 @@ export function SubmitStep() {
         return description;
     }
 
+    async function updateFencerPlaylist(fencer: Fencer, videoId: string, token: string) {
+        const updateFencerPlaylist = await fetch(`/api/tube/playlist`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ playlistId: fencer.playlistId, videoId: useVideoStore.getState().youtubeVideoId}),
+        });
+
+        if (!updateFencerPlaylist.ok) {
+            throw new Error(`Failed to update ${fencer.name} playlist`);
+        }
+
+    }
+
+
     const finishVideo = async () => {
-        const videoTitle = useVideoStore.getState().title;
-        const videoDescription = formatYouTubeDescription(useVideoStore.getState().touches as FencingTouch[]);
-        const videoFile = useVideoStore.getState().file;
-        const accessToken = useUserStore.getState().token;
 
         try {
-            if (accessToken === null) {
-                throw new Error('No access token found');
+            setStatus(EVideoStatus.UPDATING_ON_YOUTUBE);
+            const token = useUserStore.getState().token;
+            if (!token) {
+                setShowAlert(true);
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 3000);
+                throw new Error('User is not logged in');
             }
 
-            // Make your API call to upload the video
-            const formData = new FormData();
-            formData.append('videoFile', videoFile as Blob);
-            formData.append('videoTitle', videoTitle);
-            formData.append('videoDescription', videoDescription);
-            formData.append('token', String(accessToken));
+            console.log('implement update video call here')
+            await updateFencerPlaylist(leftFencer, String(useVideoStore.getState().youtubeVideoId), token);
+            await updateFencerPlaylist(rightFencer, String(useVideoStore.getState().youtubeVideoId), token);
 
-            await fetch('/api/tube', {
-                method: 'POST',
-                body: formData,
-            })
-                .then((res) => {
-                    console.log(res)
-                    if (!res.ok) {
-                        throw new Error('Failed to upload video');
-                    }
-                    setStatus(EVideoStatus.UPLOADED_TO_YOUTUBE);
-                    const modal = document.getElementById('video-success-modal');
-                    if (modal) {
-                        // @ts-ignore
-                        modal.showModal();
-                    }
-                }
-                    )
-                .catch((error) => {
-                    console.error(error);
-                    setStatus(EVideoStatus.FAILED_UPLOAD_TO_YOUTUBE);
-                    const modal = document.getElementById('video-failed-modal');
-                    if (modal) {
-                        // @ts-ignore
-                        modal.showModal();
-                    }
-                });
         } catch (error) {
-            console.error("Error uploading video:", error);
+            setStatus(EVideoStatus.FAILED_TO_UPDATE_YOUTUBE);
+            console.error("Error updating video on you tube:", error);
         }
         finally {
             return true;
@@ -125,7 +124,6 @@ export function SubmitStep() {
 
 
     const handleConfirmSave = async () => {
-        setStatus(EVideoStatus.UPLOADING_TO_YOUTUBE);
         await finishVideo();
     };
 
@@ -145,28 +143,33 @@ export function SubmitStep() {
                         <button
                             onClick={() => handleSave()}
                             className="btn btn-primary">
-                            Send Video to YouTube 🚀 📺
+                            Update Everything on YouTube 🚀 📺
                         </button>
                         <dialog id="create-video-modal" className="modal">
                             <div className="modal-box flex flex-col w-full items-center">
                                 <h3 className="font-bold text-lg">
-                                    {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" : "Are you sure 🤔"}
+                                    {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" :
+                                    <div className="flex flex-col justify-center items-center">
+                                        <div>Are you sure 🤔</div>
+                                        <div className="text-sm text-center">We will remove this video from the unprocessed list and add it to each Fencer's playlist</div>
+                                    </div>
+                                    }
                                 </h3>
-                                {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? <Spinner></Spinner> :
+                                {status === EVideoStatus.UPDATING_ON_YOUTUBE ? <Spinner></Spinner> :
                                     <div className="divider"></div>}
                                 <div className="modal-action flex w-full justify-between">
                                     <form method="dialog">
                                         <button
-                                            hidden={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
-                                            disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                            hidden={status === EVideoStatus.UPDATING_ON_YOUTUBE}
+                                            disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
                                             className="btn btn-danger">Nope
                                         </button>
                                     </form>
                                     <button
-                                        disabled={status === EVideoStatus.UPLOADING_TO_YOUTUBE}
+                                        disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
                                         className="btn btn-accent"
                                         onClick={() => handleConfirmSave()}>
-                                        {status === EVideoStatus.UPLOADING_TO_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
+                                        {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
                                     </button>
                                 </div>
                             </div>
@@ -228,6 +231,9 @@ export function SubmitStep() {
                             ))}
                         </div>
                     </div>
+                    <div>
+                        {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+                    </div>
                 </div>
             )
-        }
+}

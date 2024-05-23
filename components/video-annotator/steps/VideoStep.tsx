@@ -29,8 +29,8 @@ export function VideoStep() {
                 leftFencer: useVideoStore.getState().leftFencer,
                 rightFencer: useVideoStore.getState().rightFencer,
                 touches: useVideoStore.getState().touches,
-                youtubeUrl: useVideoStore.getState().youtubeUrl,
-                draftStatus: EVideoDraftStatus.DRAFT_SAVED_WITH_NO_VIDEO,
+                youtubeUrl: `https://www.youtube.com/watch?v=${useVideoStore.getState().youtubeVideoId}`,
+                draftStatus: EVideoDraftStatus.DRAFT_SAVED,
                 club: useVideoStore.getState().club,
             }
             try {

@@ -1,4 +1,3 @@
-import Player from "react-player";
 import React, {useRef, useState} from "react";
 import {useVideoStore} from "@/state/videoState";
 import {useTouchStore} from "@/state/touchState";
