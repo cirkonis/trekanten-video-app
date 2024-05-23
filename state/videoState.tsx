@@ -21,8 +21,8 @@ export type VideoStoreActions = {
     setStatus: (status: EVideoStatus) => void;
     getDraftStatus: () => void;
     setDraftStatus: (status: EVideoDraftStatus) => void;
-    getBucketUrl: () => void;
-    setBucketUrl: (url: string) => void;
+    getYouTubeVideoId: () => void;
+    setYouTubeVideoId: (id: string) => void;
     getYouTubeUrl: () => void;
     setYouTubeUrl: (url: string) => void;
     setVideoId: (videoId: string) => void;
@@ -48,7 +48,7 @@ const initialVideoState: Video = {
     },
     touches: [],
     url: "",
-    bucketUrl: "",
+    youtubeVideoId: "",
     youtubeUrl: "",
     status: EVideoStatus.NEW,
     draftStatus: EVideoDraftStatus.DRAFT_NOT_MADE,
@@ -71,8 +71,8 @@ export const useVideoStore = create<Video & VideoStoreActions>((set) => ({
     getStatus: () => set((state) => ({ status: state.status })),
     setStatus: (status: EVideoStatus) => set(() => ({ status: status })),
 
-    setBucketUrl: (url: string) => set(() => ({ bucketUrl: url })),
-    getBucketUrl: () => set((state) => ({ bucketUrl: state.bucketUrl })),
+    setYouTubeVideoId: (id: string) => set(() => ({ youtubeVideoId: id })),
+    getYouTubeVideoId: () => set((state) => ({ youtubeVideoId: state.youtubeVideoId })),
 
     setYouTubeUrl: (url: string) => set(() => ({ youtubeUrl: url })),
     getYouTubeUrl: () => set((state) => ({ youtubeUrl: state.youtubeUrl })),

@@ -1,5 +1,6 @@
 import "../app/globals.css";
 import React from "react";
+import {HeaderNav} from "@/components/HeaderNav";
 
 export const metadata = {
   title: 'Trekanten Video App',
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+      <HeaderNav></HeaderNav>
       {children}
       </body>
     </html>

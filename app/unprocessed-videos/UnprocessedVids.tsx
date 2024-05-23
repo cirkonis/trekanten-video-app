@@ -1,11 +1,15 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import React, {MouseEventHandler, useEffect, useState} from "react";
 import {useUserStore} from "@/state/usersState";
+import {useVideoStore} from "@/state/videoState";
+import Link from "next/link";
+
 
 export default function UnprocessedVids() {
     const [unprocessedVideos, setUnprocessedVideos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [disabled, setDisabled] = useState(false);
     const getUnprocessedVideos = async () => {
         const accessToken = useUserStore.getState().token;
 
@@ -52,11 +56,23 @@ export default function UnprocessedVids() {
     }, []);
 
 
+    function handleGetToWork(videoTitle: string, videoId: string): MouseEventHandler<HTMLButtonElement> {
+        return () => {
+            setDisabled(true);
+            setLoading(true);
+            useVideoStore.getState().setYouTubeVideoId(videoId);
+            useVideoStore.getState().setTitle(videoTitle);
+        };
+    }
+
     return (
         <div>
             {loading && <div>Loading...</div>}
             <div>
                 <h1>Unprocessed Videos</h1>
+                <button className="btn btn-accent" onClick={getUnprocessedVideos}>
+                    Re Fetch Videos
+                </button>
                 {unprocessedVideos ? (
                     <div className="overflow-x-auto">
                         <table className="table">
@@ -85,11 +101,13 @@ export default function UnprocessedVids() {
                                     </td>
                                     <td>{video.title}</td>
                                     <td>
-                                        <a className="link accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View on YouTube 📺</a>
+                                        <a className="link-accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View on YouTube 📺</a>
                                     </td>
                                     <td>{new Date(video.publishedAt).toLocaleString()}</td>
                                     <td>
-                                        <button className="btn btn-secondary">Get to work 🤺</button>
+                                        <button disabled={disabled} onClick={handleGetToWork(video.title, video.videoId)} className="btn btn-primary">
+                                            <Link href="/annotate-video">Get to work 🤺</Link>
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

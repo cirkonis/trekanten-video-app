@@ -1,7 +1,8 @@
 'use client';
 
 import React from "react";
-import {SignInForm} from "@/app/login/SignInForm";
+import {SignInButton} from "@/app/login/SignInButton";
+import {HeaderNav} from "@/components/HeaderNav";
 
 export default function Home() {
   return (
@@ -11,7 +12,7 @@ export default function Home() {
           </div>
           Welcome
           <div className="my-4">👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿👇🏿</div>
-          <SignInForm></SignInForm>
+          <SignInButton></SignInButton>
       </main>
   )
 }

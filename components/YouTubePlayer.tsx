@@ -18,7 +18,6 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
     const playerRef = useRef<HTMLDivElement | null>(null);
     const playerInstance = useRef<any>(null);
     const done = useRef(false);
-    const touchStartTime = useTouchStore(state => state.videoStartTimeStamp);
 
     const getCurrentTime = () => {
         if (playerInstance.current) {

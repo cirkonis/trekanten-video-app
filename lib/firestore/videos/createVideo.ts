@@ -10,8 +10,7 @@ export async function createVideoData(video: Video) {
             leftFencer: video.leftFencer,
             rightFencer: video.rightFencer,
             touches: JSON.stringify(video.touches),
-            bucketUrl: video.bucketUrl,
-            youtubeUrl: 'Not yet uploaded',
+            youtubeUrl: `https://www.youtube.com/watch?v=${video.id}`,
             draftStatus: video.draftStatus,
             club: video.club,
         });

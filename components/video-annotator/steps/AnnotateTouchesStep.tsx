@@ -12,6 +12,7 @@ import {useStepStore} from "@/state/annotationStepsState";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
 import {Fencer} from "@/types/fencer";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 export function AnnotateTouchesStep() {
     const uploadedVideo = useVideoStore((state) => state.url);
@@ -25,32 +26,6 @@ export function AnnotateTouchesStep() {
     const [showAlert, setShowAlert] = useState(false);
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
-
-
-    useEffect(() => {
-        const handleProgress = (state: { playedSeconds: number }) => {
-            // Update timestamp when video is playing
-            useTouchStore.getState().setVideoStartTimeStamp(state.playedSeconds);
-        };
-
-        // Subscribe to the onProgress event to detect the playing state
-        if (playerRef && playerRef.current) {
-            const player = playerRef.current.getInternalPlayer('video');
-            if (player) {
-                player.addEventListener('progress', handleProgress);
-            }
-        }
-
-        // Unsubscribe when the component unmounts
-        return () => {
-            if (playerRef && playerRef.current) {
-                const player = playerRef.current.getInternalPlayer('video');
-                if (player) {
-                    player.removeEventListener('progress', handleProgress);
-                }
-            }
-        };
-    }, [playerRef]);
 
     const handleSetStartTime = () => {
         if (playerRef.current) {
@@ -156,13 +131,7 @@ export function AnnotateTouchesStep() {
                     <p>{leftFencer.name}</p>
                     <p>{rightFencer.name}</p>
                 </div>
-                <Player
-                    ref={playerRef}
-                    url={uploadedVideo}
-                    onPlaying={() => {
-                    }}
-                    controls={true}
-                />
+            <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
             </div>
             <div className="divider"></div>
             <div className="flex justify-evenly">

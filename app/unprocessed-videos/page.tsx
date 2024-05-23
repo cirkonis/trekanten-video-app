@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import YouTubePlayer from "@/components/YouTubePlayer";
-import UnprocessedVids from "@/app/videos/UnprocessedVids";
+import UnprocessedVids from "@/app/unprocessed-videos/UnprocessedVids";
 
 export default function Videos() {
     const [videoId, setVideoId] = useState('y1ipNWV6DIE');
@@ -15,7 +15,7 @@ export default function Videos() {
 
     return (
         <div>
-            <h1>My YouTube App</h1>
+            <h1>Stuff you need to work on</h1>
             {/*<YouTubePlayer videoId={videoId} />*/}
             <UnprocessedVids />
         </div>

@@ -1,13 +1,13 @@
 "use client"; // Indicates that this module is client-side code.
 
-import {auth, signInWithGooglePopup} from "@/firebase";
+import {auth} from "@/firebase";
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useUserStore} from "@/state/usersState";
 import {User} from "@/types/user";
 import React, {useState} from "react";
 import Link from 'next/link';
 
-export function SignInForm() {
+export function SignInButton() {
 
     const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false);
 
@@ -54,10 +54,28 @@ export function SignInForm() {
 
     return (
         <div>
+            <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                    <div className="w-10 rounded-full">
+                        <img alt="user" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"/>
+                    </div>
+                </div>
+                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                    <li>
+                        <a className="justify-between">
+                            Profile
+                        </a>
+                    </li>
+                    {/*<li><a>Settings</a></li>*/}
+                    {/*<li><a>Logout</a></li>*/}
+                </ul>
+            </div>
             {userLoggedIn ? (
-                <Link href="/videos">Let's do some stuff</Link>
+                <Link className="btn btn-accent" href="/unprocessed-videos">Let's do some stuff</Link>
             ) : (
-                <button onClick={logGoogleUser}>Sign In With Google</button>
+                <button className="btn btn-warning" onClick={logGoogleUser}>
+                    Sign in with Google
+                </button>
             )}
         </div>
 
