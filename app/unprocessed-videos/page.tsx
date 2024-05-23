@@ -1,22 +1,11 @@
 'use client'
 
-import {useEffect, useState} from "react";
-import YouTubePlayer from "@/components/YouTubePlayer";
 import UnprocessedVids from "@/app/unprocessed-videos/UnprocessedVids";
 
 export default function Videos() {
-    const [videoId, setVideoId] = useState('y1ipNWV6DIE');
-
-    useEffect(() => {
-        // Optionally, fetch the video ID dynamically from an API or other source
-        // Example static video ID for demonstration
-        // setVideoId('dQw4w9WgXcQ'); // Uncomment to set a different video ID
-    }, []);
-
     return (
-        <div>
-            <h1>Stuff you need to work on</h1>
-            {/*<YouTubePlayer videoId={videoId} />*/}
+        <div className="my-4 px-6">
+            <h1 className="my-2 text-lg">Stuff you need to work on</h1>
             <UnprocessedVids />
         </div>
     );

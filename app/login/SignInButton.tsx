@@ -40,6 +40,7 @@ export function SignInButton() {
                 email: String(result.user.email),
                 loggedIn: true,
                 token: token,
+                photoURL: String(result.user.photoURL),
             };
             useUserStore.getState().setUser(user);
             setUserLoggedIn(true);
@@ -54,27 +55,26 @@ export function SignInButton() {
 
     return (
         <div>
+            {userLoggedIn ? (
             <div className="dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                     <div className="w-10 rounded-full">
-                        <img alt="user" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"/>
+                        <img alt="user" src={useUserStore.getState().photoURL}/>
                     </div>
                 </div>
                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
                     <li>
-                        <a className="justify-between">
+                        <Link href="/profile" className="justify-between">
                             Profile
-                        </a>
+                        </Link>
                     </li>
                     {/*<li><a>Settings</a></li>*/}
                     {/*<li><a>Logout</a></li>*/}
                 </ul>
             </div>
-            {userLoggedIn ? (
-                <Link className="btn btn-accent" href="/unprocessed-videos">Let's do some stuff</Link>
             ) : (
-                <button className="btn btn-warning" onClick={logGoogleUser}>
-                    Sign in with Google
+                <button className="btn btn-ghost" onClick={logGoogleUser}>
+                    Sign In
                 </button>
             )}
         </div>

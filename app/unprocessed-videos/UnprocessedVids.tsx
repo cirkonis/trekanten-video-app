@@ -69,10 +69,6 @@ export default function UnprocessedVids() {
         <div>
             {loading && <div>Loading...</div>}
             <div>
-                <h1>Unprocessed Videos</h1>
-                <button className="btn btn-accent" onClick={getUnprocessedVideos}>
-                    Re Fetch Videos
-                </button>
                 {unprocessedVideos ? (
                     <div className="overflow-x-auto">
                         <table className="table">
@@ -82,7 +78,11 @@ export default function UnprocessedVids() {
                                 <th>Title</th>
                                 <th>Video ID</th>
                                 <th>Published At</th>
-                                <th></th>
+                                <th>
+                                    <button className="btn btn-accent" onClick={getUnprocessedVideos}>
+                                        Re Fetch Videos
+                                    </button>
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -104,6 +104,7 @@ export default function UnprocessedVids() {
                                         <a className="link-accent" href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank">View on YouTube 📺</a>
                                     </td>
                                     <td>{new Date(video.publishedAt).toLocaleString()}</td>
+                                    {/*TODO REPLACE THIS WITH A MODAL POP UP SO WE CAN HAVE A CLIENT SIDE LINK TO ANNOTATE*/}
                                     <td>
                                         <button disabled={disabled} onClick={handleGetToWork(video.title, video.videoId)} className="btn btn-primary">
                                             <Link href="/annotate-video">Get to work 🤺</Link>
