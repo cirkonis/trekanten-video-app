@@ -9,6 +9,11 @@ import {EVideoStatus} from "@/enums/EVideoStatus";
 import {Spinner} from "@/components/Spinner";
 import {useUserStore} from "@/state/usersState";
 import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
+import Link from "next/link";
+import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
+import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -18,7 +23,6 @@ export function SubmitStep() {
     const [status, setStatus] = useState<EVideoStatus | null>(null);
 
     const [showAlert, setShowAlert] = useState(false);
-
 
     const handleCloseAlert = () => {
         setShowAlert(false);
@@ -87,33 +91,91 @@ export function SubmitStep() {
 
     }
 
+    async function updateVideo(token: string) {
+        const videoMetaData = {
+            id: useVideoStore.getState().youtubeVideoId,
+            title: useVideoStore.getState().title,
+            description: formatYouTubeDescription(useVideoStore.getState().touches),
+            videoId: useVideoStore.getState().youtubeVideoId,
+        }
+
+        const updateVideo = await fetch(`/api/tube/video`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(videoMetaData),
+        });
+
+        if (!updateVideo.ok) {
+            throw new Error('Failed to update video');
+        }
+    }
+
+    async function removeVideoFromPLaylist(videoId: string, token: string) {
+        const playlistId = 'PLgDEtyTQ47rJAh0vMOchK4tNAxmf4wbGM';
+        const removeVideo = await fetch(`/api/tube/playlist`, {
+            method: 'DELETE',
+            headers: {  'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playlistId: playlistId, videoId: videoId }),
+            }
+        );
+        if (!removeVideo.ok) {
+            throw new Error('Failed to remove video from playlist');
+        }
+    }
 
     const finishVideo = async () => {
-
         try {
             setStatus(EVideoStatus.UPDATING_ON_YOUTUBE);
             const token = useUserStore.getState().token;
             if (!token) {
                 setShowAlert(true);
+                useUserStore.getState().setLoggedIn(false);
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 3000);
-                throw new Error('User is not logged in');
+                throw error
             }
 
-            console.log('implement update video call here')
+            await updateVideo(token);
             await updateFencerPlaylist(leftFencer, String(useVideoStore.getState().youtubeVideoId), token);
             await updateFencerPlaylist(rightFencer, String(useVideoStore.getState().youtubeVideoId), token);
-
+            await removeVideoFromPLaylist(String(useVideoStore.getState().youtubeVideoId), token);
+            setStatus(EVideoStatus.UPDATED_ON_YOUTUBE);
+            setStatus(EVideoStatus.FINALIZING);
+            const videoData = {
+                id: useVideoStore.getState().id,
+                title: useVideoStore.getState().title,
+                leftFencer: useVideoStore.getState().leftFencer,
+                rightFencer: useVideoStore.getState().rightFencer,
+                touches: useVideoStore.getState().touches,
+                youtubeUrl: `https://www.youtube.com/watch?v=${useVideoStore.getState().youtubeVideoId}`,
+                draftStatus: EVideoDraftStatus.FINALIZED,
+                club: useVideoStore.getState().club,
+            }
+            try {
+                await updateVideoData(videoData);
+                setStatus(EVideoStatus.FINALIZED);
+            } catch (e) {
+                setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
+                console.error("Error saving draft:", e);
+            }
+            useVideoStore.getState().resetVideo();
+            const modal = document.getElementById('video-success-modal');
+            if (modal) {
+                // @ts-ignore
+                modal.showModal();
+            }
         } catch (error) {
             setStatus(EVideoStatus.FAILED_TO_UPDATE_YOUTUBE);
             console.error("Error updating video on you tube:", error);
+            const modal = document.getElementById('video-failed-modal');
+            if (modal) {
+                // @ts-ignore
+                modal.showModal();
+            }
         }
-        finally {
-            return true;
-        }
-
     }
+
     const handleSave = async () => {
         const modal = document.getElementById('create-video-modal');
         if (modal) {
@@ -126,11 +188,6 @@ export function SubmitStep() {
     const handleConfirmSave = async () => {
         await finishVideo();
     };
-
-    const handleStartOver = () => {
-        useVideoStore.getState().resetVideo();
-        useStepStore.getState().setCurrentStep (0);
-    }
 
             return (
                 <div>
@@ -181,11 +238,12 @@ export function SubmitStep() {
                                     "WE DID IT!!! 🎉🎉🎉"
                                 </h3>
                                 <div className="modal-action flex w-full justify-center">
-                                    <button
+                                    <Link
+                                        href="/"
                                         className="btn btn-accent"
-                                        onClick={() => handleStartOver()}>
-                                        Let's do it again! 🤺
-                                    </button>
+                                        >
+                                        Start Over 🤺
+                                    </Link>
                                 </div>
                             </div>
                         </dialog>
