@@ -1,3 +1,5 @@
+'use client'
+
 import React, {useEffect, useState} from "react";
 import {useVideoStore} from "@/state/videoState";
 import {Fencer} from "@/types/fencer";

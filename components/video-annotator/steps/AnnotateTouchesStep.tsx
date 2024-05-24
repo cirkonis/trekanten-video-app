@@ -1,4 +1,6 @@
-import React, {useRef, useState} from "react";
+'use client'
+
+import React, {useState} from "react";
 import {useVideoStore} from "@/state/videoState";
 import {useTouchStore} from "@/state/touchState";
 import {formatTime} from "@/utils/FormatTime";
@@ -23,7 +25,7 @@ export function AnnotateTouchesStep() {
     const [showAlert, setShowAlert] = useState(false);
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
-
+    const youtubeVideoId = useVideoStore((state) => state.youtubeVideoId); // Get youtubeVideoId
     // Sort touches by earliest video start time to latest video start time
     const sortedTouches: any = [...touches].sort((a: any, b: any) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
 
@@ -115,7 +117,11 @@ export function AnnotateTouchesStep() {
                     <p>{leftFencer.name}</p>
                     <p>{rightFencer.name}</p>
                 </div>
-                <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
+                {youtubeVideoId && youtubeVideoId != "" && ( // Conditional rendering based on youtubeVideoId
+                    <div className="w-full flex flex-col justify-evenly items-center my-8 p-16 min-h-[500px]">
+                        <YouTubePlayer videoId={String(youtubeVideoId)}></YouTubePlayer>
+                    </div>
+                )}
             </div>
             <div className="divider"></div>
             <TouchSequenceBuilder/>

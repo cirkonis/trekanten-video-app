@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import {Video} from "@/types/video";
 import {Fencer} from "@/types/fencer";
 import {FencingTouch} from "@/types/fencingTouch";
-import React from "react";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 
@@ -33,6 +32,7 @@ export type VideoStoreActions = {
 };
 
 const initialVideoState: Video = {
+    id:"",
     club: {
         name: "Trekanten",
         id: "9747fb19-5a24-4c8f-b049-78072dd70ff6"

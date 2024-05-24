@@ -1,6 +1,5 @@
-'use client'
 
-import React, {MouseEventHandler, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import {useUserStore} from "@/state/usersState";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
@@ -52,6 +51,7 @@ export default function UnprocessedVids() {
                 thumbnail: item.snippet.thumbnails.default.url,
             }));
             setUnprocessedVideos(formattedData);
+            setLoading(false);
 
         } catch (error) {
             console.error("Error getting unprocessed videos:", error);

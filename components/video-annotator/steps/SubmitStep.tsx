@@ -13,15 +13,14 @@ import Link from "next/link";
 import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 import {Simulate} from "react-dom/test-utils";
-import error = Simulate.error;
+
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
     const leftFencer = useVideoStore((state) => state.leftFencer);
     const rightFencer = useVideoStore((state) => state.rightFencer);
     const setStep = useStepStore((state) => state.setCurrentStep);
-    const [status, setStatus] = useState<EVideoStatus | null>(null);
-
+    const [status, setStatus] = useState<EVideoStatus>(EVideoStatus.NEW);
     const [showAlert, setShowAlert] = useState(false);
 
     const handleCloseAlert = () => {
@@ -75,14 +74,14 @@ export function SubmitStep() {
         return description;
     }
 
-    async function updateFencerPlaylist(fencer: Fencer, videoId: string, token: string) {
+    async function updateFencerPlaylist(fencer: Fencer, token: string) {
         const updateFencerPlaylist = await fetch(`/api/tube/playlist`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ playlistId: fencer.playlistId, videoId: useVideoStore.getState().youtubeVideoId}),
+            body: JSON.stringify({playlistId: fencer.playlistId, videoId: useVideoStore.getState().youtubeVideoId}),
         });
 
         if (!updateFencerPlaylist.ok) {
@@ -101,7 +100,7 @@ export function SubmitStep() {
 
         const updateVideo = await fetch(`/api/tube/video`, {
             method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            headers: {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'},
             body: JSON.stringify(videoMetaData),
         });
 
@@ -113,9 +112,9 @@ export function SubmitStep() {
     async function removeVideoFromPLaylist(videoId: string, token: string) {
         const playlistId = 'PLgDEtyTQ47rJAh0vMOchK4tNAxmf4wbGM';
         const removeVideo = await fetch(`/api/tube/playlist`, {
-            method: 'DELETE',
-            headers: {  'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ playlistId: playlistId, videoId: videoId }),
+                method: 'DELETE',
+                headers: {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'},
+                body: JSON.stringify({playlistId: playlistId, videoId: videoId}),
             }
         );
         if (!removeVideo.ok) {
@@ -133,12 +132,12 @@ export function SubmitStep() {
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 3000);
-                throw error
+                throw new Error('User not logged in');
             }
 
             await updateVideo(token);
-            await updateFencerPlaylist(leftFencer, String(useVideoStore.getState().youtubeVideoId), token);
-            await updateFencerPlaylist(rightFencer, String(useVideoStore.getState().youtubeVideoId), token);
+            await updateFencerPlaylist(leftFencer, token);
+            await updateFencerPlaylist(rightFencer, token);
             await removeVideoFromPLaylist(String(useVideoStore.getState().youtubeVideoId), token);
             setStatus(EVideoStatus.UPDATED_ON_YOUTUBE);
             setStatus(EVideoStatus.FINALIZING);
@@ -164,6 +163,8 @@ export function SubmitStep() {
             if (modal) {
                 // @ts-ignore
                 modal.showModal();
+            }else {
+                console.error("Modal element not found in DOM");
             }
         } catch (error) {
             setStatus(EVideoStatus.FAILED_TO_UPDATE_YOUTUBE);
@@ -172,6 +173,8 @@ export function SubmitStep() {
             if (modal) {
                 // @ts-ignore
                 modal.showModal();
+            } else {
+                console.error("Modal element not found in DOM");
             }
         }
     }
@@ -189,109 +192,111 @@ export function SubmitStep() {
         await finishVideo();
     };
 
-            return (
-                <div>
-                    <div className=" flex w-full justify-evenly mb-4">
-                        <button
-                            onClick={handleBackButton}
-                            className="btn btn-secondary">
-                            Back
-                        </button>
-                        <button
-                            onClick={() => handleSave()}
-                            className="btn btn-primary">
-                            Update Everything on YouTube 🚀 📺
-                        </button>
-                        <dialog id="create-video-modal" className="modal">
-                            <div className="modal-box flex flex-col w-full items-center">
-                                <h3 className="font-bold text-lg">
-                                    {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" :
-                                    <div className="flex flex-col justify-center items-center">
-                                        <div>Are you sure 🤔</div>
-                                        <div className="text-sm text-center">We will remove this video from the unprocessed list and add it to each Fencer's playlist</div>
+    return (
+        <div>
+            <div className=" flex w-full justify-evenly mb-4">
+                <button
+                    onClick={handleBackButton}
+                    className="btn btn-secondary">
+                    Back
+                </button>
+                <button
+                    onClick={() => handleSave()}
+                    className="btn btn-primary">
+                    Update Everything on YouTube 🚀 📺
+                </button>
+                <dialog id="create-video-modal" className="modal">
+                    <div className="modal-box flex flex-col w-full items-center">
+                        <h3 className="font-bold text-lg">
+                            {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Kick back, relax, we'll let you know if it works 🍻" :
+                                <div className="flex flex-col justify-center items-center">
+                                    <div>Are you sure 🤔</div>
+                                    <div className="text-sm text-center">We will remove this video from the unprocessed
+                                        list and add it to each Fencer's playlist
                                     </div>
-                                    }
-                                </h3>
-                                {status === EVideoStatus.UPDATING_ON_YOUTUBE ? <Spinner></Spinner> :
-                                    <div className="divider"></div>}
-                                <div className="modal-action flex w-full justify-between">
-                                    <form method="dialog">
-                                        <button
-                                            hidden={status === EVideoStatus.UPDATING_ON_YOUTUBE}
-                                            disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
-                                            className="btn btn-danger">Nope
-                                        </button>
-                                    </form>
-                                    <button
-                                        disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
-                                        className="btn btn-accent"
-                                        onClick={() => handleConfirmSave()}>
-                                        {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
-                                    </button>
                                 </div>
-                            </div>
-                        </dialog>
-                        {/* UPLOAD SUCCESSFUL */}
-                        <dialog id="video-success-modal" className="modal">
-                            <div className="modal-box flex flex-col w-full items-center">
-                                <h3 className="font-bold text-lg">
-                                    "WE DID IT!!! 🎉🎉🎉"
-                                </h3>
-                                <div className="modal-action flex w-full justify-center">
-                                    <Link
-                                        href="/"
-                                        className="btn btn-accent"
-                                        >
-                                        Start Over 🤺
-                                    </Link>
-                                </div>
-                            </div>
-                        </dialog>
-                        {/* UPLOAD FAILED MODAL */}
-                        <dialog id="video-failed-modal" className="modal">
-                            <div className="modal-box flex flex-col w-full items-center">
-                                <h3 className="font-bold text-lg">
-                                    It did not work 😡
-                                </h3>
-                                <div className="modal-action flex w-full justify-center">
-                                    <form method="dialog">
-                                        <button
-                                            className="btn btn-error">Damn it...
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </dialog>
-                    </div>
-                    <h1 className="text-2xl font-semibold px-8 mb-2">Video:
-                        <span className="font-normal text-xl ml-2">{videoTitle}</span></h1>
-                    <h1 className="text-2xl font-semibold px-8 mb-2">Fencers:
-                        <span className="font-normal text-xl ml-2">{leftFencer.name} & {rightFencer.name}</span></h1>
-                    {/* TOUCHES LIST */}
-                    <div>
-                        <h1 className="text-2xl font-semibold px-8 mb-2">Touches</h1>
-                        <div className="px-10">
-                            {sortedTouches.map((touch: any, index: number) => (
-                                <div className="w-full px-4" key={index}>
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex items-center space-x-4">
-                                            <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
-                                            <p>{touch.type}</p>
-                                            {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
-                                                <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
-                                            ) : null}
-                                            <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
-                                            <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
-                                        </div>
-                                    </div>
-                                    <div className="divider w-full"></div>
-                                </div>
-                            ))}
+                            }
+                        </h3>
+                        {status === EVideoStatus.UPDATING_ON_YOUTUBE ? <Spinner></Spinner> :
+                            <div className="divider"></div>}
+                        <div className="modal-action flex w-full justify-between">
+                            <form method="dialog">
+                                <button
+                                    hidden={status === EVideoStatus.UPDATING_ON_YOUTUBE}
+                                    disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
+                                    className="btn btn-danger">Nope
+                                </button>
+                            </form>
+                            <button
+                                disabled={status === EVideoStatus.UPDATING_ON_YOUTUBE}
+                                className="btn btn-accent"
+                                onClick={() => handleConfirmSave()}>
+                                {status === EVideoStatus.UPDATING_ON_YOUTUBE ? "Uploading to the tube 📺 🤺..." : "Finish Video"}
+                            </button>
                         </div>
                     </div>
-                    <div>
-                        {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+                </dialog>
+                {/* UPLOAD SUCCESSFUL */}
+                <dialog id="video-success-modal" className="modal">
+                    <div className="modal-box flex flex-col w-full items-center">
+                        <h3 className="font-bold text-lg">
+                            "WE DID IT!!! 🎉🎉🎉"
+                        </h3>
+                        <div className="modal-action flex w-full justify-center">
+                            <Link
+                                href="/"
+                                className="btn btn-accent"
+                            >
+                                Start Over 🤺
+                            </Link>
+                        </div>
                     </div>
+                </dialog>
+                {/* UPLOAD FAILED MODAL */}
+                <dialog id="video-failed-modal" className="modal">
+                    <div className="modal-box flex flex-col w-full items-center">
+                        <h3 className="font-bold text-lg">
+                            It did not work 😡
+                        </h3>
+                        <div className="modal-action flex w-full justify-center">
+                            <form method="dialog">
+                                <button
+                                    className="btn btn-error">Damn it...
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </dialog>
+            </div>
+            <h1 className="text-2xl font-semibold px-8 mb-2">Video:
+                <span className="font-normal text-xl ml-2">{videoTitle}</span></h1>
+            <h1 className="text-2xl font-semibold px-8 mb-2">Fencers:
+                <span className="font-normal text-xl ml-2">{leftFencer.name} & {rightFencer.name}</span></h1>
+            {/* TOUCHES LIST */}
+            <div>
+                <h1 className="text-2xl font-semibold px-8 mb-2">Touches</h1>
+                <div className="px-10">
+                    {sortedTouches.map((touch: any, index: number) => (
+                        <div className="w-full px-4" key={index}>
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-4">
+                                    <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
+                                    <p>{touch.type}</p>
+                                    {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
+                                        <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
+                                    ) : null}
+                                    <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
+                                    <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
+                                </div>
+                            </div>
+                            <div className="divider w-full"></div>
+                        </div>
+                    ))}
                 </div>
-            )
+            </div>
+            <div>
+                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+            </div>
+        </div>
+    )
 }

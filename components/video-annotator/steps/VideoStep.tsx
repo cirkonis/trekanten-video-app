@@ -1,12 +1,11 @@
 import {useVideoStore} from "@/state/videoState";
-import React, {useEffect, useRef, useState} from "react";
-import Player from "react-player";
+import React, {useState} from "react";
 import {useStepStore} from "@/state/annotationStepsState";
 import {EVideoStatus} from "@/enums/EVideoStatus";
-import {v4 as uuidv4} from 'uuid';
 import {createVideoData} from "@/lib/firestore/videos/createVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 import YouTubePlayer from "@/components/YouTubePlayer";
+import {Video} from "@/types/video";
 
 
 export function VideoStep() {
@@ -14,7 +13,7 @@ export function VideoStep() {
     const newVidDocId = useVideoStore.getState().youtubeVideoId;
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
-
+    const youtubeVideoId = useVideoStore((state) => state.youtubeVideoId); // Get youtubeVideoId
 
     const setVideoTitle = (title: string) => {
         useVideoStore.getState().setTitle(title);
@@ -23,12 +22,13 @@ export function VideoStep() {
     const handleNextStep = async () => {
         if (videoTitle) {
             setStatus(EVideoStatus.SAVING_DRAFT);
-            const videoData = {
+            const videoData: Video = {
                 id: newVidDocId,
                 title: useVideoStore.getState().title,
                 leftFencer: useVideoStore.getState().leftFencer,
                 rightFencer: useVideoStore.getState().rightFencer,
                 touches: useVideoStore.getState().touches,
+                youtubeVideoId: useVideoStore.getState().youtubeVideoId,
                 youtubeUrl: `https://www.youtube.com/watch?v=${useVideoStore.getState().youtubeVideoId}`,
                 draftStatus: EVideoDraftStatus.DRAFT_SAVED,
                 club: useVideoStore.getState().club,
@@ -58,10 +58,11 @@ export function VideoStep() {
                        required
                 />
             </div>
-            <div className="w-full flex flex-col justify-evenly items-center my-8 p-16 min-h-[500px]">
-                <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
-            </div>
-
+            {youtubeVideoId && youtubeVideoId != "" && ( // Conditional rendering based on youtubeVideoId
+                <div className="w-full flex flex-col justify-evenly items-center my-8 p-16 min-h-[500px]">
+                    <YouTubePlayer videoId={String(youtubeVideoId)}></YouTubePlayer>
+                </div>
+            )}
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
                 <button

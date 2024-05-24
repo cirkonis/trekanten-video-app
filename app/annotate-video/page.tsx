@@ -15,13 +15,14 @@ export const fetchCache = "force-no-store";
 export default function Video() {
 
     const currentStep = useStepStore((state) => state.currentStep);
-    const setCurrentStep = useStepStore((state) => state.setCurrentStep);
-    const selectedYouTubeVideoId = useVideoStore.getState().youtubeVideoId;
+    // const setCurrentStep = useStepStore((state) => state.setCurrentStep);
+    // const selectedYouTubeVideoId = useVideoStore.getState().youtubeVideoId;
+    const selectedYouTubeVideoId = "";
 
     const [hasVideoID, setHasVideoID] = useState(true);
 
     useEffect(() => {
-        if (!selectedYouTubeVideoId) {
+        if (selectedYouTubeVideoId === "") {
             setHasVideoID(false);
         }
     }, [selectedYouTubeVideoId]);
@@ -58,7 +59,7 @@ export default function Video() {
                     <li
                         key={index}
                         className={`step ${index <= currentStep ? "step-primary" : ""}`}
-                        onClick={() => setCurrentStep(index)}
+                        // onClick={() => setCurrentStep(index)}
                     >
                         {step.label}
                     </li>

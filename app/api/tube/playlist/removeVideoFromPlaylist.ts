@@ -40,7 +40,7 @@ export async function removeVideoFromPlaylist(accessToken: string, playlistId: s
         }
 
         await youtube.playlistItems.delete({
-            id: playlistItemId
+            id: String(playlistItemId),
         });
 
         return new Response(JSON.stringify({ message: 'Video removed from the playlist' }), {
