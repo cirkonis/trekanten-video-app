@@ -3,7 +3,7 @@ import React, { useEffect, useState} from "react";
 import {useUserStore} from "@/state/usersState";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
-import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
+import {AlertMessage} from "@/components/AlertMessage";
 
 
 export default function UnprocessedVids() {
@@ -136,7 +136,7 @@ export default function UnprocessedVids() {
                 )}
             </div>
             <div>
-                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+                {showAlert && <AlertMessage alertMessage="Not logged in!" onClose={handleCloseAlert}/>}
             </div>
             <dialog id="confirm-modal" className="modal">
                 <div className="modal-box flex flex-col w-full">

@@ -1,11 +1,11 @@
 'use client'
 
 import React, {useEffect, useState} from "react";
-import { FencersStep } from "@/components/video-annotator/steps/FencersStep";
+import { FencersStep } from "@/app/annotate-video/video-annotator/steps/FencersStep";
 import {useStepStore} from "@/state/annotationStepsState";
-import {VideoStep} from "@/components/video-annotator/steps/VideoStep";
-import {AnnotateTouchesStep} from "@/components/video-annotator/steps/AnnotateTouchesStep";
-import {SubmitStep} from "@/components/video-annotator/steps/SubmitStep";
+import {VideoStep} from "@/app/annotate-video/video-annotator/steps/VideoStep";
+import {AnnotateTouchesStep} from "@/app/annotate-video/video-annotator/steps/AnnotateTouchesStep";
+import {SubmitStep} from "@/app/annotate-video/video-annotator/steps/SubmitStep";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
 
@@ -16,8 +16,7 @@ export default function Video() {
 
     const currentStep = useStepStore((state) => state.currentStep);
     // const setCurrentStep = useStepStore((state) => state.setCurrentStep);
-    // const selectedYouTubeVideoId = useVideoStore.getState().youtubeVideoId;
-    const selectedYouTubeVideoId = "";
+    const selectedYouTubeVideoId = useVideoStore.getState().youtubeVideoId;
 
     const [hasVideoID, setHasVideoID] = useState(true);
 

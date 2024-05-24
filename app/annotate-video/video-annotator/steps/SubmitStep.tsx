@@ -8,12 +8,10 @@ import {FencingTouch} from "@/types/fencingTouch";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {Spinner} from "@/components/Spinner";
 import {useUserStore} from "@/state/usersState";
-import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
+import {AlertMessage} from "@/components/AlertMessage";
 import Link from "next/link";
 import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
-import {Simulate} from "react-dom/test-utils";
-
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -244,7 +242,7 @@ export function SubmitStep() {
                         </h3>
                         <div className="modal-action flex w-full justify-center">
                             <Link
-                                href="/"
+                                href="/public"
                                 className="btn btn-accent"
                             >
                                 Start Over 🤺
@@ -295,7 +293,7 @@ export function SubmitStep() {
                 </div>
             </div>
             <div>
-                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+                {showAlert && <AlertMessage alertMessage="Not logged in!" onClose={handleCloseAlert}/>}
             </div>
         </div>
     )

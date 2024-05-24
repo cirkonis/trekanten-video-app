@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import {addFencer} from "@/lib/firestore/fencers/addFencer";
 import {Fencer} from "@/types/fencer";
-;import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import {useUserStore} from "@/state/usersState";
-import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
+import {AlertMessage} from "@/components/AlertMessage";
 
 interface CreateFencerProps {
     onCreate: (name: string) => void;
@@ -13,6 +13,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
     const [name, setName] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("ALERT");
 
     const handleCloseAlert = () => {
         setShowAlert(false);
@@ -23,6 +24,8 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
         if (modal) {
             // @ts-ignore
             modal.showModal();
+        } else {
+            console.error("Modal not found");
         }
     };
 
@@ -32,10 +35,12 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
             setLoading(true)
             const token = useUserStore.getState().token;
             if (!token) {
+                setAlertMessage("You must be logged in to create a fencer");
                 setShowAlert(true);
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 3000);
+                useUserStore.getState().setLoggedIn(false);
                 throw new Error('User is not logged in');
             }
 
@@ -47,6 +52,11 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
                 },
                 body: JSON.stringify({ title: name }),
             });
+
+            if(res.status === 429) {
+                setAlertMessage("You Tube API rate limit exceeded. Please try again later.");
+                setShowAlert(true);
+            }
 
             if (!res.ok) {
                 throw new Error('Failed to create playlist');
@@ -112,7 +122,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
                 </dialog>
             </div>
             <div>
-                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
+                {showAlert && <AlertMessage alertMessage={alertMessage} onClose={handleCloseAlert}/>}
             </div>
         </div>
     );

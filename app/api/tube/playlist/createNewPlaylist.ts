@@ -30,6 +30,15 @@ export async function createNewPlaylist(accessToken: string, title: string) {
             },
         });
 
+        if(response.status === 429) {
+            return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+                status: 429,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
+
         // Extract the ID of the newly created playlist
         const newPlaylistId = response.data.id;
 
