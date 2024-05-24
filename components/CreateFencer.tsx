@@ -1,4 +1,9 @@
 import React, {useState} from "react";
+import {addFencer} from "@/lib/firestore/fencers/addFencer";
+import {Fencer} from "@/types/fencer";
+;import { v4 as uuidv4 } from 'uuid';
+import {useUserStore} from "@/state/usersState";
+import {NotLoggedInAlert} from "@/components/NotLoggedInAlert";
 
 interface CreateFencerProps {
     onCreate: (name: string) => void;
@@ -7,9 +12,13 @@ interface CreateFencerProps {
 export function CreateFencer({onCreate}: CreateFencerProps) {
     const [name, setName] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [showAlert, setShowAlert] = useState(false);
+
+    const handleCloseAlert = () => {
+        setShowAlert(false);
+    };
 
     const handleCreate = async () => {
-        setLoading(true);
         const modal = document.getElementById('create-fencer-modal');
         if (modal) {
             // @ts-ignore
@@ -19,31 +28,43 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
 
 
     const handleConfirmCreate = async () => {
-        // TODO MM 12/23 add dynamic clubID
         try {
-            // Make your API call to create a new fencer
-            await fetch('/api/fencers', {
+            setLoading(true)
+            const token = useUserStore.getState().token;
+            if (!token) {
+                setShowAlert(true);
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 3000);
+                throw new Error('User is not logged in');
+            }
+
+            const res = await fetch(`/api/tube/playlist`, {
                 method: 'POST',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    fencer: {
-                        name: name
-                    },
-                    clubId: "9747fb19-5a24-4c8f-b049-78072dd70ff6"
-                })
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    // Notify parent component about the new fencer
-                    onCreate(data.name); // Assuming the response contains the created fencer's data
-                })
-                .catch(() => {
-                    console.error("Error creating fencer")
-                });
-            setName(""); // Reset the input after creating a new fencer
+                body: JSON.stringify({ title: name }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to create playlist');
+            }
+
+            const data = await res.json();
+            const newPlaylistId = data.id;
+
+            const newFencer: Fencer = {
+                id: uuidv4(),
+                name: name,
+                playlistId: newPlaylistId,
+            };
+
+           await addFencer(newFencer);
+           setName("");
+           onCreate(name);
+
         } catch (error) {
             console.error("Error creating fencer:", error);
         } finally {
@@ -68,7 +89,7 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
                     onChange={(e) => setName(e.target.value)}
                 />
                 <button className="btn btn-secondary ml-4"
-                        disabled={loading || name === ""}
+                        disabled={loading || !name.trim()}
                         onClick={() => handleCreate()}>Create Fencer
                 </button>
                 <dialog id="create-fencer-modal" className="modal">
@@ -84,11 +105,14 @@ export function CreateFencer({onCreate}: CreateFencerProps) {
                                 <button className="btn btn-danger">Nope</button>
                             </form>
                             <button className="btn btn-accent" onClick={() => handleConfirmCreate()}>
-                                {!loading ? "Creating..." : "Create Fencer"}
+                                {loading ? "Creating..." : "Create Fencer"}
                             </button>
                         </div>
                     </div>
                 </dialog>
+            </div>
+            <div>
+                {showAlert && <NotLoggedInAlert onClose={handleCloseAlert}/>}
             </div>
         </div>
     );

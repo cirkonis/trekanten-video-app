@@ -4,8 +4,6 @@ import {Fencer} from "@/types/fencer";
 import {CreateFencer} from "@/components/CreateFencer";
 import {useStepStore} from "@/state/annotationStepsState";
 import {getFencers} from "@/lib/firestore/fencers/getFencers";
-import {v4 as uuidv4} from "uuid";
-import {addFencer} from "@/lib/firestore/fencers/addFencer";
 import {EVideoStatus} from "@/enums/EVideoStatus";
 import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
 
@@ -36,15 +34,16 @@ export function FencersStep() {
         }
     };
 
-    const handleCreateFencer = async (name: string) => {
+    async function handleAfterCreateFencer(){
         try {
-            await addFencer({id: uuidv4(), name: name});
-        }catch (e) {
-            console.error('Error creating fencer:', e);
+            const fencersData: Fencer[] = await getFencers();
+            setFencers(fencersData);
+        } catch (error) {
+            console.error("Error fetching fencers:", error);
+        } finally {
+            setLoading(false); // This will run regardless of success or failure
         }
-        // Notify parent component about the new fencer
-        setFencers((prevFencers) => [...prevFencers, { id: "new-id", name }]); // Replace with actual fencer data
-    };
+    }
 
     // Function to check if both selected fencers are valid
     const areSelectedFencersValid = () => {
@@ -148,7 +147,7 @@ export function FencersStep() {
             <div hidden={status === EVideoStatus.SAVING_DRAFT}
                  className="flex w-full flex-row justify-evenly items-center my-8">
                 <CreateFencer
-                    onCreate={handleCreateFencer} />
+                    onCreate={handleAfterCreateFencer} />
             </div>
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
@@ -157,7 +156,7 @@ export function FencersStep() {
                     onClick={handleNextStep}
                     disabled={!areSelectedFencersValid() || status === EVideoStatus.SAVING_DRAFT}
                 >
-                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Annotate Touces"}
+                    {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Annotate Touches"}
                 </button>
             </div>
         </div>

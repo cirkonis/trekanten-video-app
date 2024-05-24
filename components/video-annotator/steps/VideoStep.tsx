@@ -6,58 +6,36 @@ import {EVideoStatus} from "@/enums/EVideoStatus";
 import {v4 as uuidv4} from 'uuid';
 import {createVideoData} from "@/lib/firestore/videos/createVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 
 export function VideoStep() {
-    const uploadedVideo = useVideoStore((state) => state.url);
-    const setUploadedVideo = useVideoStore((state) => state.setUploadedVideo);
     const videoTitle = useVideoStore((state) => state.title);
+    const newVidDocId = useVideoStore.getState().youtubeVideoId;
     const setStep = useStepStore((state) => state.setCurrentStep);
     const [status, setStatus] = useState<EVideoStatus | null>(null);
-
-    const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Local state for the uploaded file
-
-    const playerRef = useRef<Player | null>(null);
-
-    useEffect(() => {
-        useVideoStore.getState().setPlayerRef(playerRef);
-    }, []);
 
 
     const setVideoTitle = (title: string) => {
         useVideoStore.getState().setTitle(title);
     }
 
-    const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files !== null && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            setUploadedVideo(URL.createObjectURL(file)); // Set the URL
-            setUploadedFile(file); // Update the uploaded file state
-            useVideoStore.getState().setFile(file);
-        } else {
-            // TODO: Handle error with at least alert message
-            console.error('Error uploading video');
-        }
-    };
-
     const handleNextStep = async () => {
-        if (videoTitle && uploadedVideo) {
+        if (videoTitle) {
             setStatus(EVideoStatus.SAVING_DRAFT);
-            useVideoStore.getState().setVideoId(uuidv4());
-            useVideoStore.getState().setBucketUrl(`videos/${useVideoStore.getState().id}/${useVideoStore.getState().title}`);
             const videoData = {
-                id: useVideoStore.getState().id,
+                id: newVidDocId,
                 title: useVideoStore.getState().title,
                 leftFencer: useVideoStore.getState().leftFencer,
                 rightFencer: useVideoStore.getState().rightFencer,
                 touches: useVideoStore.getState().touches,
-                bucketUrl: useVideoStore.getState().bucketUrl,
-                youtubeUrl: 'Not yet uploaded',
-                draftStatus: EVideoDraftStatus.DRAFT_SAVED_WITH_NO_VIDEO,
+                youtubeUrl: `https://www.youtube.com/watch?v=${useVideoStore.getState().youtubeVideoId}`,
+                draftStatus: EVideoDraftStatus.DRAFT_SAVED,
                 club: useVideoStore.getState().club,
             }
             try {
                 await createVideoData(videoData);
+                useVideoStore.getState().setVideoId(String(newVidDocId));
                 setStatus(EVideoStatus.SAVED_DRAFT);
                 setStep(1);
             } catch (e) {
@@ -81,38 +59,15 @@ export function VideoStep() {
                 />
             </div>
             <div className="w-full flex flex-col justify-evenly items-center my-8 p-16 min-h-[500px]">
-                {!uploadedVideo && (
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-32 h-32">
-                            <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/>
-                        </svg>
-                    </div>
-                )}
-                {uploadedVideo && (
-                    <div>
-                        <Player
-                            ref={playerRef}
-                            url={uploadedVideo}
-                            onPlaying={() => {
-                            }}
-                            controls={true}
-                        />
-                    </div>
-                )}
-                <input
-                    type="file"
-                    accept="video/*"
-                    className="mt-6 file-input file-input-bordered w-full max-w-xs"
-                    disabled={status === EVideoStatus.SAVING_DRAFT}
-                    onChange={handleVideoUpload}
-                />
+                <YouTubePlayer videoId={String(useVideoStore.getState().youtubeVideoId)}></YouTubePlayer>
             </div>
+
             {/* Conditionally set the disabled attribute based on videoTitle and uploadedVideo */}
             <div className="px-8 flex w-full justify-end">
                 <button
                     className="btn btn-primary"
                     onClick={handleNextStep}
-                    disabled={!videoTitle || !uploadedVideo || status === EVideoStatus.SAVING_DRAFT}
+                    disabled={!videoTitle || status === EVideoStatus.SAVING_DRAFT}
                 >
                     {status === EVideoStatus.SAVING_DRAFT ? "Saving draft data 💾 🤺" : "Next: Select Fencers"}
                 </button>
