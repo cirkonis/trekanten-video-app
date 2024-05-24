@@ -242,7 +242,7 @@ export function SubmitStep() {
                         </h3>
                         <div className="modal-action flex w-full justify-center">
                             <Link
-                                href="/public"
+                                href="/"
                                 className="btn btn-accent"
                             >
                                 Start Over 🤺
