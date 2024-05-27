@@ -15,3 +15,13 @@ export type FencingTouch = {
     fencingEndTime?: number;
     position: EPistePositions;
 };
+
+
+export type Touch = {
+    type: string;
+    pointAwardedTo: { name: string; id: string; playlistId: string }[];
+    touchAgainst: { name: string; id: string; playlistId: string }[];
+    sequence: string[];
+    videoStartTimeStamp: number;
+    position: string;
+}
