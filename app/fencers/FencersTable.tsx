@@ -65,14 +65,14 @@ export default function FencersTable() {
                                 <a className="link-accent" href={`https://www.youtube.com/playlist?list=${fencer.playlistId}`} target="_blank">View
                                     on YouTube 📺</a>
                             </td>
-                            <td className="text-gray-400">
-                                <Link href={``}>
-                                    View Finished Videos
+                            <td>
+                                <Link className="link-accent" href={`/fencers/${fencer.id}`}>
+                                    View Fencer Data
                                 </Link>
                             </td>
                             <td className="text-gray-400">
                                 <Link href={``}>
-                                    View Fencer Data
+                                    View Finished Videos
                                 </Link>
                             </td>
                         </tr>
