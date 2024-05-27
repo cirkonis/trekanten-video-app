@@ -2,10 +2,12 @@ import {useVideoStore} from "@/state/videoState";
 import React, {useState} from "react";
 import {useStepStore} from "@/state/annotationStepsState";
 import {EVideoStatus} from "@/enums/EVideoStatus";
-import {createVideoData} from "@/lib/firestore/videos/createVideo";
+import {createDraftVideoData} from "@/lib/firestore/draft-videos/createVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 import YouTubePlayer from "@/components/YouTubePlayer";
 import {Video} from "@/types/video";
+import {getDraftVideoData} from "@/lib/firestore/draft-videos/getVideos";
+import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 
 
 export function VideoStep() {
@@ -34,7 +36,15 @@ export function VideoStep() {
                 club: useVideoStore.getState().club,
             }
             try {
-                await createVideoData(videoData);
+                const videoExist = await getDraftVideoData(String(newVidDocId));
+                console.log(videoExist);
+                if(videoExist === null) {
+                    console.log('doesnt exist, creating')
+                    await createDraftVideoData(videoData);
+                } else{
+                    console.log('exist and updating')
+                    await updateDraftVideoData(videoData)
+                }
                 useVideoStore.getState().setVideoId(String(newVidDocId));
                 setStatus(EVideoStatus.SAVED_DRAFT);
                 setStep(1);

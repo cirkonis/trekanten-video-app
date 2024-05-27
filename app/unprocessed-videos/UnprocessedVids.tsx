@@ -4,6 +4,7 @@ import {useUserStore} from "@/state/usersState";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
 import {AlertMessage} from "@/components/AlertMessage";
+import {useStepStore} from "@/state/annotationStepsState";
 
 
 export default function UnprocessedVids() {
@@ -72,7 +73,7 @@ export default function UnprocessedVids() {
                 setDisabled(true);
                 useVideoStore.getState().setYouTubeVideoId(videoId);
                 useVideoStore.getState().setTitle(videoTitle);
-
+                useStepStore.getState().setCurrentStep(0);
                 const modal = document.getElementById('confirm-modal');
                 if (modal) {
                     // @ts-ignore

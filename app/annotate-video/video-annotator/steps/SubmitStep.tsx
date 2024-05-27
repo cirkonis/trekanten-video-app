@@ -10,8 +10,10 @@ import {Spinner} from "@/components/Spinner";
 import {useUserStore} from "@/state/usersState";
 import {AlertMessage} from "@/components/AlertMessage";
 import Link from "next/link";
-import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
+import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
+import {createFinishedVideoData} from "@/lib/firestore/finished-videos/createVideo";
+import {deleteDraftVideoData} from "@/lib/firestore/draft-videos/deleteVideo";
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -150,7 +152,8 @@ export function SubmitStep() {
                 club: useVideoStore.getState().club,
             }
             try {
-                await updateVideoData(videoData);
+                await createFinishedVideoData(videoData);
+                await deleteDraftVideoData(String(videoData.id));
                 setStatus(EVideoStatus.FINALIZED);
             } catch (e) {
                 setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);

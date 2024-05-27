@@ -11,7 +11,7 @@ import {ETouchTypes} from "@/enums/ETouchTypes";
 import {FencingTouch} from "@/types/fencingTouch";
 import {useStepStore} from "@/state/annotationStepsState";
 import {EVideoStatus} from "@/enums/EVideoStatus";
-import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
+import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 import {Fencer} from "@/types/fencer";
 import YouTubePlayer from "@/components/YouTubePlayer";
 
@@ -45,7 +45,7 @@ export function AnnotateTouchesStep() {
             touches: useVideoStore.getState().touches,
         }
         try {
-            await updateVideoData(videoData);
+            await updateDraftVideoData(videoData);
             setStatus(EVideoStatus.SAVED_DRAFT);
         } catch (e) {
             setStatus(EVideoStatus.FAILED_TO_SAVE_DRAFT);
