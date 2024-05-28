@@ -37,12 +37,9 @@ export function VideoStep() {
             }
             try {
                 const videoExist = await getDraftVideoData(String(newVidDocId));
-                console.log(videoExist);
                 if(videoExist === null) {
-                    console.log('doesnt exist, creating')
                     await createDraftVideoData(videoData);
                 } else{
-                    console.log('exist and updating')
                     await updateDraftVideoData(videoData)
                 }
                 useVideoStore.getState().setVideoId(String(newVidDocId));

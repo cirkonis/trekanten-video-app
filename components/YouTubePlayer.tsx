@@ -4,7 +4,6 @@ import React, {useEffect, useRef} from 'react';
 import {useTouchStore} from "@/state/touchState";
 import {useStepStore} from "@/state/annotationStepsState";
 import {formatTime} from "@/utils/FormatTime";
-import {useVideoStore} from "@/state/videoState";
 
 declare global {
     interface Window {
@@ -20,7 +19,7 @@ interface YouTubePlayerProps {
 const YouTubePlayer: React.FC<YouTubePlayerProps> = ({videoId}) => {
     const playerRef = useRef<HTMLDivElement | null>(null);
     const playerInstance = useRef<any>(null);
-    const done = useRef(false);
+    // const done = useRef(false);
     const touchStartTime = useTouchStore(state => state.videoStartTimeStamp);
 
     const handleSetStartTime = () => {
@@ -28,7 +27,6 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({videoId}) => {
             const time = playerInstance.current.getCurrentTime();
             const currentTime = Math.round(time);
             useTouchStore.getState().setVideoStartTimeStamp(currentTime);
-            console.log(useTouchStore.getState().videoStartTimeStamp);
         }
     };
 
@@ -57,27 +55,27 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({videoId}) => {
                 playerVars: {
                     playsinline: 1,
                 },
-                events: {
-                    onReady: onPlayerReady,
-                    onStateChange: onPlayerStateChange,
-                },
+                // events: {
+                //     onReady: onPlayerReady,
+                //     onStateChange: onPlayerStateChange,
+                // },
             });
         };
 
-        const onPlayerReady = (event: any) => {
-            event.target.playVideo();
-        };
-
-        const onPlayerStateChange = (event: any) => {
-            if (event.data === window.YT.PlayerState.PLAYING && !done.current) {
-                setTimeout(stopVideo, 6000);
-                done.current = true;
-            }
-        };
-
-        const stopVideo = () => {
-            playerInstance.current.stopVideo();
-        };
+        // const onPlayerReady = (event: any) => {
+        //     event.target.playVideo();
+        // };
+        //
+        // const onPlayerStateChange = (event: any) => {
+        //     if (event.data === window.YT.PlayerState.PLAYING && !done.current) {
+        //         setTimeout(stopVideo, 6000);
+        //         done.current = true;
+        //     }
+        // };
+        //
+        // const stopVideo = () => {
+        //     playerInstance.current.stopVideo();
+        // };
 
         loadYouTubeIframeAPI();
 
@@ -102,7 +100,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({videoId}) => {
                                 <div>Touch start time:</div>
                                 <div className="text-xl mx-2">{formatTime(touchStartTime)} </div>
                             </div>
-                            <button className="btn btn-accent btn-sm mx-4" onClick={handleSetStartTime}>Set Touch Start
+                            <button className="btn btn-accent btn-lg mx-4" onClick={handleSetStartTime}>Set Touch Start
                                 Time
                             </button>
                         </div>

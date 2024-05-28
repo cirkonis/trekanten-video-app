@@ -24,6 +24,7 @@ export default function UnprocessedVids() {
             const token = useUserStore.getState().token;
             if (!token) {
                 setShowAlert(true);
+                useUserStore.getState().setLoggedIn(false);
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 3000);
@@ -39,7 +40,16 @@ export default function UnprocessedVids() {
                 },
             })
 
+
             if (!res.ok) {
+                if (res.status === 401) {
+                    setShowAlert(true);
+                    useUserStore.getState().setLoggedIn(false);
+                    useUserStore.getState().setToken('');
+                    setTimeout(() => {
+                        setShowAlert(false);
+                    }, 3000);
+                }
                 throw new Error('Failed to fetch unprocessed videos');
             }
 

@@ -22,6 +22,15 @@ export async function ListPlaylistVideos(accessToken: string, id: string) {
             playlistId: id,
         });
 
+        if(res.status === 401) {
+            return new Response(JSON.stringify({error: 'Unauthorized'}), {
+                status: 401,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
+
         return new Response(JSON.stringify(res), {
             status: 201,
             headers: {

@@ -14,6 +14,7 @@ import {EVideoStatus} from "@/enums/EVideoStatus";
 import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 import {Fencer} from "@/types/fencer";
 import YouTubePlayer from "@/components/YouTubePlayer";
+import {EPistePositions} from "@/enums/EPistePositions";
 
 export function AnnotateTouchesStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -75,11 +76,25 @@ export function AnnotateTouchesStep() {
             addTouch();
         } else {
             // Display an alert message
-            setAlertMessage("Please fill out all touch information before adding.");
+            switch (true) {
+                case startTime === 0:
+                    setAlertMessage("Set the touch start time before adding.");
+                    break;
+                case sequence.length === 0:
+                    setAlertMessage("Add a touch sequence before adding.");
+                    break;
+                case touchType === null:
+                    setAlertMessage("Select a touch before adding.");
+                    break;
+                default:
+                    setAlertMessage("Please fill out all touch information before adding.");
+            }
             setShowAlert(true);
+            setTimeout(() => {
+                setShowAlert(false)
+            }, 3000)
         }
     }
-
 
     async function addTouch() {
         useVideoStore.getState().addTouch({
@@ -91,7 +106,7 @@ export function AnnotateTouchesStep() {
             videoEndTimeStamp: useTouchStore.getState().videoEndTimeStamp,
             fencingStartTime: useTouchStore.getState().fencingStartTime,
             fencingEndTime: useTouchStore.getState().fencingEndTime,
-            position: useTouchStore.getState().position,
+            positions: useTouchStore.getState().positions,
         });
         await updateDraftTouches();
         // Reset the touch state after adding
@@ -118,7 +133,7 @@ export function AnnotateTouchesStep() {
                     <p>{rightFencer.name}</p>
                 </div>
                 {youtubeVideoId && youtubeVideoId != "" && ( // Conditional rendering based on youtubeVideoId
-                    <div className="w-full flex flex-col justify-evenly items-center my-8 p-16 min-h-[500px]">
+                    <div className="w-full flex flex-col justify-evenly items-center min-h-[500px]">
                         <YouTubePlayer videoId={String(youtubeVideoId)}></YouTubePlayer>
                     </div>
                 )}
@@ -170,12 +185,35 @@ export function AnnotateTouchesStep() {
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-4">
                                     <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
-                                    <p>{touch.type}</p>
-                                    {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
-                                        <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
-                                    ) : null}
-                                    <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
-                                    <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
+                                    <div className="flex">
+                                        <p>{touch.type}</p>
+                                        {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
+                                            <p>&nbsp; for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
+                                        ) : null}
+                                    </div>
+                                    <div className="flex-shrink-0 ">Sequence: {touch.sequence.join(', ')}</div>
+                                </div>
+                                <div className="flex">
+                                    <div>Piste Position: &nbsp; </div>
+                                    <div>
+                                        {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT ? (
+                                            <p>{touch.positions[0].position}</p>
+                                        ) : null}</div>
+                                    <div>
+                                        {touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
+                                            <p>{touch.positions[1].position}</p>) : null}
+                                    </div>
+                                    <div>
+                                        {touch.type === ETouchTypes.DOUBLE_TOUCH ? (
+                                            <div>
+                                            {touch.positions[0].position === EPistePositions.ZONE_1 ? (<p>{EPistePositions.ZONE_1}</p>) : null}
+                                            {touch.positions[0].position === EPistePositions.OWN_ZONE_2 ? (<p>{EPistePositions.LEFT_ZONE_2}</p>) : null}
+                                            {touch.positions[0].position === EPistePositions.OWN_ZONE_3 ? (<p>{EPistePositions.LEFT_ZONE_3}</p>) : null}
+                                            {touch.positions[1].position === EPistePositions.OWN_ZONE_2 ? (<p>{EPistePositions.RIGHT_ZONE_2}</p>) : null}
+                                            {touch.positions[1].position === EPistePositions.OWN_ZONE_3 ? (<p>{EPistePositions.RIGHT_ZONE_3}</p>) : null}
+                                            </div>
+                                            ) : null}
+                                    </div>
                                 </div>
                                 <button className="btn btn-warning btn-circle btn-small" onClick={() => handleRemoveTouch(touch)}>🗑️</button>
                             </div>

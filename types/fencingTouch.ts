@@ -1,7 +1,7 @@
 import {ETouchTypes} from "@/enums/ETouchTypes";
-import {EPistePositions} from "@/enums/EPistePositions";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
 import {Fencer} from "@/types/fencer";
+import {TPistePosition} from "@/types/pistePosition";
 
 export type FencingTouch = {
     id?: number;
@@ -13,7 +13,7 @@ export type FencingTouch = {
     videoEndTimeStamp?: number;
     fencingStartTime?: number;
     fencingEndTime?: number;
-    position: EPistePositions;
+    positions: TPistePosition[];
 };
 
 
