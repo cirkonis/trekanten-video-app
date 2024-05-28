@@ -5,11 +5,11 @@ import { getAllTouchesForFencer } from '@/lib/firestore/touches/getFencerTouches
 import { getFencerById } from '@/lib/firestore/fencers/getFencerById';
 import { Fencer } from '@/types/fencer';
 import PistePositionPie from '@/app/fencers/[fencerId]/charts/PistePositionPie';
-import {Touch} from "@/types/fencingTouch";
+import {FencingTouch} from "@/types/fencingTouch";
 
 export default function Touches({ params }: { params: { fencerId: string } }) {
     const [fencer, setFencer] = useState<Fencer | null>(null);
-    const [touches, setTouches] = useState<Touch[]>([]);
+    const [touches, setTouches] = useState<FencingTouch[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -43,11 +43,11 @@ export default function Touches({ params }: { params: { fencerId: string } }) {
     }
 
     // Filter touches into touchesFor and touchesAgainst
-    const touchesFor: Touch[] = touches.filter(touch =>
+    const touchesFor: FencingTouch[] = touches.filter(touch =>
         touch.pointAwardedTo.some(fencerAwarded => fencerAwarded.id === params.fencerId)
     );
 
-    const touchesAgainst = touches.filter(touch =>
+    const touchesAgainst: FencingTouch[] = touches.filter(touch =>
         touch.touchAgainst.some(fencerAgainst => fencerAgainst.id === params.fencerId)
     );
 
@@ -69,8 +69,8 @@ export default function Touches({ params }: { params: { fencerId: string } }) {
             <div>
                 <h1 className="py-4">Piste Position for Touches</h1>
                 <div className="flex">
-                    <PistePositionPie title="Awarded" touchData={touchesFor} />
-                    <PistePositionPie title="Against" touchData={touchesAgainst} />
+                    <PistePositionPie title="Awarded" touchData={touchesFor} fencerName={String(fencer?.name)} />
+                    <PistePositionPie title="Against" touchData={touchesAgainst} fencerName={String(fencer?.name)} />
                 </div>
             </div>
         </div>

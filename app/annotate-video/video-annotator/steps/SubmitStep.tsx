@@ -1,5 +1,3 @@
-import {formatTime} from "@/utils/FormatTime";
-import {ETouchTypes} from "@/enums/ETouchTypes";
 import React, {useState} from "react";
 import {useVideoStore} from "@/state/videoState";
 import {useStepStore} from "@/state/annotationStepsState";
@@ -10,10 +8,10 @@ import {Spinner} from "@/components/Spinner";
 import {useUserStore} from "@/state/usersState";
 import {AlertMessage} from "@/components/AlertMessage";
 import Link from "next/link";
-import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 import {EVideoDraftStatus} from "@/enums/EVideoDraftStatus";
 import {createFinishedVideoData} from "@/lib/firestore/finished-videos/createVideo";
 import {deleteDraftVideoData} from "@/lib/firestore/draft-videos/deleteVideo";
+import {TouchesList} from "@/components/TouchesList";
 
 export function SubmitStep() {
     const videoTitle = useVideoStore((state) => state.title);
@@ -26,14 +24,6 @@ export function SubmitStep() {
     const handleCloseAlert = () => {
         setShowAlert(false);
     };
-
-    function compareTimes(timeA: number, timeB: number): number {
-        return timeA - timeB;
-    }
-
-    const touches = useVideoStore((state) => state.touches);
-
-    const sortedTouches: any[] = [...touches].sort((a: any, b: any) => compareTimes(a.videoStartTimeStamp, b.videoStartTimeStamp));
 
     function handleBackButton() {
         setStep(2);
@@ -58,14 +48,17 @@ export function SubmitStep() {
 
             // Get the fencer name
             let fencerName: string;
-            if (touch.pointAwardedTo.length > 0) {
+            if (touch.pointAwardedTo.length == 1) {
                 fencerName = touch.pointAwardedTo[0].name;
-            } else {
-                fencerName = "No one";
+            } else if (touch.pointAwardedTo.length == 2) {
+                fencerName = "Both Fencers";
+            }
+            else {
+                fencerName = "no one";
             }
 
             // Construct the touch description
-            const touchDescription = `${formattedTimestamp} ${sequence} to ${fencerName}\n`;
+            const touchDescription = `${formattedTimestamp}   Sequence: ${sequence}   Point awarded to: ${fencerName}\n`;
 
             // Append the touch description to the overall description
             description += touchDescription;
@@ -109,7 +102,7 @@ export function SubmitStep() {
         }
     }
 
-    async function removeVideoFromPLaylist(videoId: string, token: string) {
+    async function removeVideoFromPlaylist(videoId: string, token: string) {
         const playlistId = 'PLgDEtyTQ47rJAh0vMOchK4tNAxmf4wbGM';
         const removeVideo = await fetch(`/api/tube/playlist`, {
                 method: 'DELETE',
@@ -138,7 +131,7 @@ export function SubmitStep() {
             await updateVideo(token);
             await updateFencerPlaylist(leftFencer, token);
             await updateFencerPlaylist(rightFencer, token);
-            await removeVideoFromPLaylist(String(useVideoStore.getState().youtubeVideoId), token);
+            await removeVideoFromPlaylist(String(useVideoStore.getState().youtubeVideoId), token);
             setStatus(EVideoStatus.UPDATED_ON_YOUTUBE);
             setStatus(EVideoStatus.FINALIZING);
             const videoData = {
@@ -273,28 +266,7 @@ export function SubmitStep() {
                 <span className="font-normal text-xl ml-2">{videoTitle}</span></h1>
             <h1 className="text-2xl font-semibold px-8 mb-2">Fencers:
                 <span className="font-normal text-xl ml-2">{leftFencer.name} & {rightFencer.name}</span></h1>
-            {/* TOUCHES LIST */}
-            <div>
-                <h1 className="text-2xl font-semibold px-8 mb-2">Touches</h1>
-                <div className="px-10">
-                    {sortedTouches.map((touch: any, index: number) => (
-                        <div className="w-full px-4" key={index}>
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center space-x-4">
-                                    <h2 className="mr-2">Touch {index + 1} - {formatTime(touch.videoStartTimeStamp)}</h2>
-                                    <p>{touch.type}</p>
-                                    {touch.type === ETouchTypes.SINGLE_TOUCH_LEFT || touch.type === ETouchTypes.SINGLE_TOUCH_RIGHT ? (
-                                        <p>for {touch.pointAwardedTo.map((fencer: Fencer) => fencer.name).join(', ')}</p>
-                                    ) : null}
-                                    <p className="flex-shrink-0 ml-6">Sequence: {touch.sequence.join(', ')}</p>
-                                    <p className="flex-shrink-0 ml-6">Piste Position: {touch.position}</p>
-                                </div>
-                            </div>
-                            <div className="divider w-full"></div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <TouchesList></TouchesList>
             <div>
                 {showAlert && <AlertMessage alertMessage="Not logged in!" onClose={handleCloseAlert}/>}
             </div>

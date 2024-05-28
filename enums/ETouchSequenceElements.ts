@@ -4,9 +4,11 @@ export enum ETouchSequenceElements {
     PARRY="Parry",
     RIPOSTE="Riposte",
     COUNTER="Counter",
+    PREPERATION="Preperation",
     BEAT="Beat",
     LINE="Line",
     NO="No",
     SIMULTANEOUS="Simultaneous",
     REMISE="Remise",
+    REPRISE="Reprise",
 }

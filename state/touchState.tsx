@@ -4,6 +4,7 @@ import {Fencer} from "@/types/fencer";
 import {ETouchTypes} from "@/enums/ETouchTypes";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
 import {TPistePosition} from "@/types/pistePosition";
+import {EPistePositions} from "@/enums/EPistePositions";
 
 export type TouchStoreActions = {
     // SETTERS
@@ -39,7 +40,10 @@ const initialTouchState: FencingTouch = {
     // videoEndTimeStamp: 0,
     // fencingStartTime: 0,
     // fencingEndTime: 0,
-    positions: [],
+    positions: [
+        {position: EPistePositions.ZONE_1, fencerName: ""},
+        {position: EPistePositions.ZONE_1, fencerName: ""},
+    ],
 };
 
 export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => ({
