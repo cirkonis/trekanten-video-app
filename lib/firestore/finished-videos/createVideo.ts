@@ -2,9 +2,9 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Video } from "@/types/video";
 
-export async function createVideoData(video: Video) {
+export async function createFinishedVideoData(video: Video) {
     try {
-        const docRef = await addDoc(collection(db, "videos"), {
+        const docRef = await addDoc(collection(db, "finished-videos"), {
             id: video.id,
             title: video.title,
             leftFencer: video.leftFencer,

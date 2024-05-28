@@ -1,15 +1,16 @@
-"use client"; // Indicates that this module is client-side code.
-
+"use client"; ``
 import {auth} from "@/firebase";
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useUserStore} from "@/state/usersState";
 import {User} from "@/types/user";
-import React, {useState} from "react";
+import React from "react";
 import Link from 'next/link';
 
 export function SignInButton() {
+    const userStore = useUserStore();
+    const userLoggedIn = userStore.loggedIn;
+    const userPhotoURL = userStore.photoURL;
 
-    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(useUserStore.getState().loggedIn || false );
 
     // Define the required scopes
     const SCOPES = [
@@ -43,7 +44,6 @@ export function SignInButton() {
                 photoURL: String(result.user.photoURL),
             };
             useUserStore.getState().setUser(user);
-            setUserLoggedIn(true);
         } catch (error: any) {
             // Handle Errors here.
             const errorMessage = error.message;
@@ -59,7 +59,7 @@ export function SignInButton() {
             <div className="dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                     <div className="w-10 rounded-full">
-                        <img alt="user" src={useUserStore.getState().photoURL}/>
+                        <img alt="user" src={userPhotoURL}/>
                     </div>
                 </div>
                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">

@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import {FencingTouch} from "@/types/fencingTouch";
 import {Fencer} from "@/types/fencer";
 import {ETouchTypes} from "@/enums/ETouchTypes";
-import {EPistePositions} from "@/enums/EPistePositions";
 import {ETouchSequenceElements} from "@/enums/ETouchSequenceElements";
+import {TPistePosition} from "@/types/pistePosition";
+import {EPistePositions} from "@/enums/EPistePositions";
 
 export type TouchStoreActions = {
     // SETTERS
@@ -15,7 +16,7 @@ export type TouchStoreActions = {
     setVideoEndTimeStamp: (endTime: number) => void;
     setFencingStartTime: (startTime: number) => void;
     setFencingEndTime: (endTime: number) => void;
-    setPosition: (position: EPistePositions) => void;
+    setPositions: (positions: TPistePosition[]) => void;
     // GETTERS
     getTouchType: () => void;
     getPointAwardedTo: () => void;
@@ -25,7 +26,7 @@ export type TouchStoreActions = {
     getVideoEndTimeStamp: () => void;
     getFencingStartTime: () => void;
     getFencingEndTime: () => void;
-    getPosition: () => void;
+    getPositions: () => void;
     // RESET
     resetTouch: () => void;
 };
@@ -39,7 +40,10 @@ const initialTouchState: FencingTouch = {
     // videoEndTimeStamp: 0,
     // fencingStartTime: 0,
     // fencingEndTime: 0,
-    position: EPistePositions.CENTER_LINE,
+    positions: [
+        {position: EPistePositions.ZONE_1, fencerName: ""},
+        {position: EPistePositions.ZONE_1, fencerName: ""},
+    ],
 };
 
 export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => ({
@@ -54,7 +58,7 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
         setVideoEndTimeStamp: (endTime: number) => set((state) => ({ videoEndTimeStamp: endTime })),
         setFencingStartTime: (startTime: number) => set((state) => ({ fencingStartTime: startTime})),
         setFencingEndTime: (endTime: number) => set((state) => ({ fencingEndTime: endTime })),
-        setPosition: (position: EPistePositions) => set((state) => ({ position: position })),
+        setPositions: (positions: TPistePosition[]) => set((state) => ({ positions: positions })),
 
         // GETTERS
         getTouchType: () => set((state) => ({ type: state.type })),
@@ -65,7 +69,7 @@ export const useTouchStore = create<FencingTouch & TouchStoreActions>((set) => (
         getVideoEndTimeStamp: () => set((state) => ({ videoEndTimeStamp: state.videoEndTimeStamp })),
         getFencingStartTime: () => set((state) => ({ fencingStartTime: state.fencingStartTime })),
         getFencingEndTime: () => set((state) => ({ fencingEndTime: state.fencingEndTime })),
-        getPosition: () => set((state) => ({ position: state.position })),
+        getPositions: () => set((state) => ({ positions: state.positions })),
 
         // RESET
         resetTouch: () => set({ ...initialTouchState }), // Reset action

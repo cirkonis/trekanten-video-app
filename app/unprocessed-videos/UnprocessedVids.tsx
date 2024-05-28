@@ -4,6 +4,7 @@ import {useUserStore} from "@/state/usersState";
 import {useVideoStore} from "@/state/videoState";
 import Link from "next/link";
 import {AlertMessage} from "@/components/AlertMessage";
+import {useStepStore} from "@/state/annotationStepsState";
 
 
 export default function UnprocessedVids() {
@@ -23,6 +24,7 @@ export default function UnprocessedVids() {
             const token = useUserStore.getState().token;
             if (!token) {
                 setShowAlert(true);
+                useUserStore.getState().setLoggedIn(false);
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 3000);
@@ -38,7 +40,16 @@ export default function UnprocessedVids() {
                 },
             })
 
+
             if (!res.ok) {
+                if (res.status === 401) {
+                    setShowAlert(true);
+                    useUserStore.getState().setLoggedIn(false);
+                    useUserStore.getState().setToken('');
+                    setTimeout(() => {
+                        setShowAlert(false);
+                    }, 3000);
+                }
                 throw new Error('Failed to fetch unprocessed videos');
             }
 
@@ -72,7 +83,7 @@ export default function UnprocessedVids() {
                 setDisabled(true);
                 useVideoStore.getState().setYouTubeVideoId(videoId);
                 useVideoStore.getState().setTitle(videoTitle);
-
+                useStepStore.getState().setCurrentStep(0);
                 const modal = document.getElementById('confirm-modal');
                 if (modal) {
                     // @ts-ignore

@@ -13,14 +13,14 @@ env_variables:
   REDIRECT_URI: proccess.env.REDIRECT_URI
   YOUTUBE_CHANNEL_ID: proccess.env.YOUTUBE_CHANNEL_ID
   NEXT_PUBLIC_FB_API_KEY: proccess.env.NEXT_PUBLIC_FB_API_KEY
-  UNPROCESSED_VIDEOS_PLAYLIST_ID=: proccess.env.UNPROCESSED_VIDEOS_PLAYLIST_ID
+  UNPROCESSED_VIDEOS_PLAYLIST_ID: proccess.env.UNPROCESSED_VIDEOS_PLAYLIST_ID
 
-#automatic_scaling:
-#  target_cpu_utilization: 0.75
-#  min_instances: 0
-#  max_instances: 0
+automatic_scaling:
+  target_cpu_utilization: 0.75
+  min_instances: 0
+  max_instances: 0
 
 
-# Manually scaling your application
-manual_scaling:
-  instances: 1
+## Manually scaling your application
+#manual_scaling:
+#  instances: 1

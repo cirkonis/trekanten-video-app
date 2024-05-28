@@ -7,7 +7,7 @@ import {CreateFencer} from "@/components/CreateFencer";
 import {useStepStore} from "@/state/annotationStepsState";
 import {getFencers} from "@/lib/firestore/fencers/getFencers";
 import {EVideoStatus} from "@/enums/EVideoStatus";
-import {updateVideoData} from "@/lib/firestore/videos/updateVideo";
+import {updateDraftVideoData} from "@/lib/firestore/draft-videos/updateVideo";
 
 export function FencersStep() {
     const [fencers, setFencers] = useState<Fencer[]>([]);
@@ -65,7 +65,7 @@ export function FencersStep() {
             rightFencer: useVideoStore.getState().rightFencer,
         }
         try {
-            await updateVideoData(videoData);
+            await updateDraftVideoData(videoData);
             setStatus(EVideoStatus.SAVED_DRAFT);
             setStep(2);
 
